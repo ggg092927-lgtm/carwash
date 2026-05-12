@@ -1,0 +1,868 @@
+<!DOCTYPE html>
+<html lang="ka">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>თვითმომსახურების სამრეცხაო</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0;}
+body{font-family:'Segoe UI',sans-serif;background:#f0f4f8;min-height:100vh;padding:16px;}
+.wrap{max-width:480px;margin:0 auto;}
+.hero{background:#0a1628;color:#fff;padding:2rem 1.5rem 1.5rem;text-align:center;border-radius:18px;margin-bottom:14px;position:relative;overflow:hidden;}
+.hero::before{content:'';position:absolute;top:-40px;right:-40px;width:160px;height:160px;background:#1a3a6e;border-radius:50%;}
+.hero::after{content:'';position:absolute;bottom:-50px;left:-20px;width:140px;height:140px;background:#0d2244;border-radius:50%;}
+.hero-content{position:relative;z-index:1;}
+.hero h1{font-size:22px;font-weight:600;margin-bottom:4px;}
+.hero-sub{font-size:12px;opacity:0.55;}
+.night-badge{display:inline-flex;align-items:center;gap:6px;background:rgba(255,255,255,0.1);border:1px solid rgba(255,255,255,0.15);border-radius:20px;padding:5px 12px;font-size:12px;margin-bottom:10px;}
+.dot{width:7px;height:7px;background:#4ade80;border-radius:50%;animation:pulse 2s infinite;}
+@keyframes pulse{0%,100%{opacity:1;}50%{opacity:0.4;}}
+.tab-row{display:flex;gap:6px;margin-bottom:14px;}
+.tab{flex:1;padding:10px 4px;border-radius:12px;border:1px solid #d1dae6;background:#fff;font-size:11px;cursor:pointer;text-align:center;color:#6b7a90;transition:all 0.18s;}
+.tab.active{background:#0a1628;color:#fff;border-color:#0a1628;}
+.tab-content{display:none;}
+.tab-content.active{display:block;}
+.card{background:#fff;border:1px solid #e2e8f0;border-radius:16px;padding:1.25rem;margin-bottom:12px;box-shadow:0 1px 3px rgba(0,0,0,0.04);}
+.card-title{display:flex;align-items:center;gap:8px;font-size:15px;font-weight:600;margin-bottom:14px;color:#0a1628;}
+.input-row{display:flex;gap:8px;margin-bottom:10px;}
+.input-row input{flex:1;padding:11px 14px;border:1px solid #d1dae6;border-radius:10px;font-size:15px;background:#f8fafc;color:#0a1628;outline:none;transition:border 0.15s;}
+.input-row input:focus{border-color:#0a1628;}
+.btn-primary{background:#0a1628;color:#fff;border:none;border-radius:10px;padding:11px 16px;font-size:14px;font-weight:600;cursor:pointer;}
+.stamps{display:flex;gap:8px;flex-wrap:wrap;margin:12px 0 8px;}
+.stamp{width:40px;height:40px;border-radius:50%;border:2px dashed #c8d3e0;display:flex;align-items:center;justify-content:center;font-size:18px;}
+.stamp.filled{background:#0a1628;border-color:#0a1628;color:#7dd3fc;}
+.stamp.free-slot{border-color:#4ade80;color:#4ade80;opacity:0.4;}
+.stamp.free-done{background:#16a34a;border-color:#16a34a;color:#fff;}
+.progress-text{font-size:13px;color:#6b7a90;}
+.result-box{border-radius:10px;padding:12px 14px;font-size:14px;margin-top:10px;display:none;}
+.result-box.success{background:#f0fdf4;border:1px solid #86efac;color:#166534;}
+.result-box.free{background:#fef3c7;border:1px solid #fbbf24;color:#92400e;}
+.result-box.error{background:#fef2f2;border:1px solid #fca5a5;color:#991b1b;}
+.result-box.info{background:#eff6ff;border:1px solid #93c5fd;color:#1e40af;}
+.prices-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:12px;}
+.price-card{background:#f8fafc;border:1px solid #e2e8f0;border-radius:12px;padding:12px 8px;text-align:center;}
+.price-card .icon{font-size:22px;margin-bottom:4px;}
+.price-card .pname{font-size:11px;color:#6b7a90;margin-bottom:3px;}
+.price-card .pprice{font-size:18px;font-weight:700;color:#0a1628;}
+.combo-bar{background:#0a1628;color:#fff;border-radius:12px;padding:14px 16px;display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;}
+.combo-bar .cl{font-size:14px;font-weight:600;}
+.combo-bar .cl small{opacity:0.55;font-size:11px;display:block;font-weight:400;margin-top:2px;}
+.combo-price .old{font-size:11px;text-decoration:line-through;opacity:0.45;text-align:right;}
+.combo-price .new{font-size:24px;font-weight:700;line-height:1;}
+.combo-save{background:#4ade80;color:#052e16;font-size:10px;border-radius:10px;padding:2px 7px;font-weight:700;}
+.night-bar{background:#fff;border:1px solid #e2e8f0;border-radius:12px;padding:14px 16px;display:flex;align-items:center;gap:12px;margin-bottom:12px;}
+.night-icon{width:42px;height:42px;background:#0a1628;border-radius:50%;display:flex;align-items:center;justify-content:center;flex-shrink:0;font-size:20px;}
+.night-disc{background:#bae6fd;color:#0a1628;border-radius:10px;padding:5px 14px;font-size:20px;font-weight:700;margin-left:auto;}
+.acc-pills{display:flex;gap:7px;flex-wrap:wrap;}
+.acc-pill{font-size:12px;background:#f0f4f8;border:1px solid #e2e8f0;border-radius:20px;padding:5px 12px;color:#374151;}
+.qr-box{text-align:center;padding:1rem 0;}
+.qr-label{font-size:13px;color:#6b7a90;}
+.footer{text-align:center;padding:1.2rem 0 0.5rem;font-size:12px;color:#9ba8b5;}
+.info-note{background:#eff6ff;border:1px solid #93c5fd;border-radius:10px;padding:10px 14px;font-size:13px;color:#1e40af;margin-top:10px;text-align:center;}
+
+/* Language switcher */
+.lang-row{display:flex;gap:6px;justify-content:flex-end;margin-bottom:10px;}
+.lang-btn{padding:5px 12px;border-radius:20px;border:1px solid #d1dae6;background:#fff;font-size:12px;cursor:pointer;color:#6b7a90;font-weight:600;}
+.lang-btn.active{background:#0a1628;color:#fff;border-color:#0a1628;}
+
+/* Saved number banner */
+.saved-banner{background:#f0fdf4;border:1px solid #86efac;border-radius:12px;padding:10px 14px;display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;}
+.saved-banner-txt{font-size:13px;color:#166534;font-weight:600;}
+.saved-banner-clear{font-size:12px;color:#6b7a90;cursor:pointer;text-decoration:underline;}
+
+/* Visit history */
+.visit-item{padding:8px 0;border-bottom:1px solid #f0f4f8;font-size:13px;color:#374151;display:flex;justify-content:space-between;}
+.visit-item:last-child{border-bottom:none;}
+
+/* Share button */
+.btn-share{width:100%;padding:12px;background:#f0f4f8;color:#0a1628;border:1px solid #d1dae6;border-radius:12px;font-size:14px;font-weight:600;cursor:pointer;margin-top:10px;display:flex;align-items:center;justify-content:center;gap:8px;}
+.btn-share:hover{background:#e2e8f0;}
+
+/* Screenshot button */
+.btn-screenshot{width:100%;padding:12px;background:linear-gradient(135deg,#0a1628,#1a3a6e);color:#fff;border:none;border-radius:12px;font-size:14px;font-weight:600;cursor:pointer;margin-top:10px;display:flex;align-items:center;justify-content:center;gap:8px;box-shadow:0 4px 12px rgba(10,22,40,0.25);}
+.btn-screenshot:hover{opacity:0.9;}
+.btn-screenshot:active{transform:scale(0.98);}
+
+/* QR coupon button */
+.btn-qr-goto{display:block;width:100%;padding:14px;background:linear-gradient(135deg,#f59e0b,#d97706);color:#fff;border:none;border-radius:14px;font-size:15px;font-weight:700;cursor:pointer;margin-top:12px;text-align:center;box-shadow:0 4px 14px rgba(245,158,11,0.35);}
+.btn-qr-goto:hover{opacity:0.92;}
+.btn-qr-goto:active{transform:scale(0.98);}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<!-- Language switcher -->
+<div class="lang-row">
+  <button class="lang-btn active" onclick="setLang('ka',this)">ქა</button>
+  <button class="lang-btn" onclick="setLang('en',this)">EN</button>
+</div>
+
+<div class="hero">
+  <div class="hero-content">
+    <div class="night-badge"><span class="dot"></span><span id="live-lbl">ჩვეულებრივი ტარიფი</span></div>
+    <h1 id="hero-title">თვითმომსახურების სამრეცხაო</h1>
+    <p class="hero-sub" id="live-time"></p>
+  </div>
+</div>
+
+<div class="tab-row">
+  <div class="tab active" onclick="showTab('loyalty',this)" id="tab-btn-loyalty">⭐ ბარათი</div>
+  <div class="tab" onclick="showTab('prices',this)" id="tab-btn-prices">🏷️ ფასები</div>
+  <div class="tab" onclick="showTab('photo',this)" id="tab-btn-photo">📸 ფოტო</div>
+  <div class="tab" onclick="showTab('qr',this)" id="tab-btn-qr">🎁 შაბათი</div>
+  <div class="tab" onclick="showTab('howto',this)" id="tab-btn-howto">🧼 ინსტრ.</div>
+</div>
+
+<!-- LOYALTY TAB -->
+<div id="tab-loyalty" class="tab-content active">
+  <div id="saved-banner" style="display:none;" class="saved-banner">
+    <span class="saved-banner-txt" id="saved-banner-txt">📱 შენახული: </span>
+    <span class="saved-banner-clear" onclick="clearSaved()" id="lbl-clear">გასუფთავება</span>
+  </div>
+  <div class="card">
+    <div class="card-title" id="lbl-card-title">📱 ჩემი ლოიალობის ბარათი</div>
+    <div class="input-row">
+      <input type="tel" id="phone-input" placeholder="599123456" maxlength="12"/>
+      <button class="btn-primary" onclick="checkCard()">🔍</button>
+    </div>
+    <!-- Remember checkbox -->
+    <label style="display:flex;align-items:center;gap:8px;font-size:13px;color:#6b7a90;margin-bottom:8px;cursor:pointer;">
+      <input type="checkbox" id="remember-me" style="width:16px;height:16px;cursor:pointer;"/>
+      <span id="lbl-remember">ნომრის დამახსოვრება</span>
+    </label>
+    <div id="loyalty-result" class="result-box"></div>
+    <div id="stamp-section" style="display:none;">
+      <div style="background:#0a1628;color:#fff;border-radius:10px;padding:10px 14px;text-align:center;font-size:13px;font-weight:600;margin-bottom:10px;">🎁 <span id="lbl-promo">ყოველი მე-10 რეცხვა — <span style="color:#4ade80;">უფასოა!</span></span></div>
+      <div class="stamps" id="stamps-display"></div>
+      <p class="progress-text" id="progress-text"></p>
+
+      <!-- Visit history -->
+      <div id="visit-history" style="display:none;margin-top:12px;">
+        <p style="font-size:12px;font-weight:600;color:#0a1628;margin-bottom:6px;" id="lbl-last-visits">ბოლო ვიზიტები:</p>
+        <div id="visit-list"></div>
+      </div>
+
+      <div class="info-note" id="lbl-op-note">რეცხვის ჩამატება ოპერატორთანაა 🛠️</div>
+
+      <!-- Share button -->
+      <button class="btn-share" onclick="shareCard()" id="share-btn">🔗 ბარათის გაზიარება</button>
+      <!-- Screenshot button -->
+      <button class="btn-screenshot" onclick="takeScreenshot()">📲 ეკრანის გადმოტანა</button>
+    </div>
+  </div>
+</div>
+
+<!-- PRICES TAB -->
+<div id="tab-prices" class="tab-content">
+  <div class="prices-grid" style="grid-template-columns:1fr 1fr;margin-bottom:12px;">
+    <div class="price-card">
+      <div class="icon">🚿</div>
+      <div class="pname" id="lbl-wash-normal">ჩვეულებრივი</div>
+      <div class="pprice" id="price-wash-normal">3₾</div>
+    </div>
+    <div class="price-card">
+      <div class="icon">🌙</div>
+      <div class="pname" id="lbl-wash-night">ღამის ფასი</div>
+      <div class="pprice" id="price-wash-night">2.4₾</div>
+    </div>
+  </div>
+  <div class="combo-bar">
+    <div class="cl" id="combo-label">კომბო: 3 აქსესუარი<small>მტვერსასრუტი · ბორბლები · ხალიჩა</small></div>
+    <div class="combo-price"><div class="old">14₾</div><div class="new">11₾ <span class="combo-save">-21%</span></div></div>
+  </div>
+  <div class="night-bar">
+    <div class="night-icon">🌙</div>
+    <div><p style="font-size:14px;font-weight:600;color:#0a1628;" id="night-title">ღამის ტარიფი</p><p style="font-size:12px;color:#6b7a90;" id="night-hours">00:00 – 08:00 ყოველდღე</p></div>
+    <div class="night-disc" id="night-disc">-20%</div>
+  </div>
+  <div class="card" style="background:#f8fafc;">
+    <p style="font-size:13px;font-weight:600;margin-bottom:8px;color:#0a1628;" id="acc-title">აქსესუარები ცალ-ცალკე</p>
+    <div class="acc-pills">
+      <span class="acc-pill" id="acc1">🌀 მტვერსასრუტი 4₾</span>
+      <span class="acc-pill" id="acc2">⚙️ ბორბლები 5₾</span>
+      <span class="acc-pill" id="acc3">🟫 ხალიჩა 5₾</span>
+    </div>
+  </div>
+</div>
+
+<!-- PHOTO TAB -->
+<div id="tab-photo" class="tab-content">
+  <div class="card">
+    <div class="card-title" id="photo-title">📸 მანქანის ფოტო</div>
+    <p style="font-size:13px;color:#6b7a90;margin-bottom:14px;" id="photo-desc">გადაიღე შედეგი და გამოგვიგზავნე — ღამის გალერეაში გამოჩნდება! 🌙</p>
+    <div class="input-row">
+      <input type="tel" id="photo-phone" placeholder="599123456" maxlength="12"/>
+    </div>
+    <div class="input-row">
+      <input type="text" id="photo-name" placeholder="სახელი და გვარი" id="photo-name"/>
+    </div>
+    <div id="photo-drop" onclick="document.getElementById('photo-file').click()" style="border:2px dashed #c8d3e0;border-radius:14px;padding:2rem 1rem;text-align:center;cursor:pointer;background:#f8fafc;transition:border 0.2s;margin-bottom:12px;">
+      <div style="font-size:40px;margin-bottom:8px;">📷</div>
+      <p style="font-size:14px;color:#6b7a90;" id="lbl-choose-photo">დააჭირე ფოტოს ასარჩევად</p>
+      <p style="font-size:12px;color:#c8d3e0;margin-top:4px;">JPG / PNG · მაქს. 10MB</p>
+    </div>
+    <input type="file" id="photo-file" accept="image/*" style="display:none;" onchange="previewPhoto(this)"/>
+    <div id="photo-preview" style="display:none;margin-bottom:12px;text-align:center;">
+      <img id="preview-img" style="max-width:100%;max-height:260px;border-radius:12px;border:1px solid #e2e8f0;"/>
+    </div>
+    <button class="btn-primary" style="width:100%;padding:13px;font-size:15px;" onclick="uploadPhoto()" id="upload-btn">📤 <span id="lbl-send">გაგზავნა</span></button>
+    <div id="photo-result" class="result-box" style="margin-top:10px;"></div>
+  </div>
+</div>
+
+<!-- QR TAB -->
+<div id="tab-qr" class="tab-content">
+  <div class="card">
+    <div class="card-title" id="lbl-coupon-title">🎁 შაბათის კუპონი</div>
+    <div class="qr-box">
+      <div style="font-size:100px;text-align:center;margin:10px 0;">📱</div>
+      <p class="qr-label" id="lbl-scan">სკანირება → შაბათის სპეციალური ფასდაკლება</p>
+    </div>
+    <button class="btn-qr-goto" onclick="showTab('loyalty', document.getElementById('tab-btn-loyalty'))">
+      📱 ჩემი ლოიალობის ბარათი →
+    </button>
+  </div>
+  <div class="card" style="background:#f8fafc;text-align:center;">
+    <p style="font-size:15px;font-weight:600;margin-bottom:6px;color:#0a1628;" id="lbl-loyalty-prog">ლოიალობის პროგრამა</p>
+    <p style="font-size:14px;color:#374151;" id="lbl-loyalty-desc">ყოველი მე-10 რეცხვა → <strong>1 უფასო 🎉</strong></p>
+    <p style="font-size:12px;color:#6b7a90;margin-top:8px;" id="lbl-loyalty-hint">"ჩემი ბარათი" ჩანართში შეიყვანე ნომერი</p>
+  </div>
+</div>
+
+<!-- HOW-TO TAB -->
+<div id="tab-howto" class="tab-content">
+  <div class="card">
+    <div class="card-title" id="howto-title">🧼 როგორ ვირეცხოთ</div>
+    <div id="howto-content" style="font-size:14px;color:#374151;line-height:1.8;">
+      <div style="text-align:center;padding:20px;color:#9ba8b5;font-size:13px;">⏳ იტვირთება...</div>
+    </div>
+  </div>
+</div>
+
+<div class="footer" id="footer-txt">24/7 · თვითმომსახურება · ხარისხი</div>
+</div>
+
+<script>
+var BIN_ID = '69ffbf37250b1311c3295b21';
+var API_KEY = '$2a$10$9DtWMw4mQ3z2.ohB/nRgLOnAB6kcyUIfgEI4AF409KEQaoBbHB0KK';
+var BASE_URL = 'https://api.jsonbin.io/v3/b/' + BIN_ID;
+var PHOTOS_BIN_ID = '6a004143250b1311c32bd4b1';
+var IMGBB_KEY = '785105c57c22607c0cf5870e63b768f9';
+var currentPhone = '';
+var allData = {};
+var currentLang = 'ka';
+var currentPrices = { washNormal: 3, washNight: 2.4, vacuum: 4, wheels: 5, carpet: 5, comboOld: 14, comboNew: 11, nightDisc: 20 };
+
+/* ===== LOAD PRICES FROM API ===== */
+function loadPrices() {
+  fetch(BASE_URL + '/latest', { headers: { 'X-Master-Key': API_KEY } })
+    .then(function(r){ return r.json(); })
+    .then(function(r){
+      var data = r.record || {};
+      if (data['_prices']) {
+        currentPrices = data['_prices'];
+      }
+      applyPrices();
+    })
+    .catch(function(){ applyPrices(); }); // fallback to defaults
+}
+
+function applyPrices() {
+  var p = currentPrices;
+  // Night discount display
+  var disc = document.getElementById('night-disc');
+  if (disc) disc.textContent = '-' + p.nightDisc + '%';
+
+  // Combo bar
+  var comboOldEl = document.querySelector('.combo-price .old');
+  var comboNewEl = document.querySelector('.combo-price .new');
+  var comboSaveEl = document.querySelector('.combo-save');
+  if (comboOldEl) comboOldEl.textContent = p.comboOld + '₾';
+  if (comboNewEl) {
+    var savePct = Math.round((1 - p.comboNew / p.comboOld) * 100);
+    comboNewEl.innerHTML = p.comboNew + '₾ <span class="combo-save">-' + savePct + '%</span>';
+  }
+
+  // Accessories pills
+  document.getElementById('acc1').textContent = t('vacuum') + ' ' + p.vacuum + '₾';
+  document.getElementById('acc2').textContent = t('wheels') + ' ' + p.wheels + '₾';
+  document.getElementById('acc3').textContent = t('carpet') + ' ' + p.carpet + '₾';
+
+  // Price cards (main wash prices)
+  var washNormalEl = document.getElementById('price-wash-normal');
+  var washNightEl = document.getElementById('price-wash-night');
+  if (washNormalEl) washNormalEl.textContent = p.washNormal + '₾';
+  if (washNightEl) washNightEl.textContent = p.washNight + '₾';
+
+  // Update night discount in updateTime
+  updateTime();
+}
+
+/* ===== TRANSLATIONS ===== */
+var T = {
+  ka: {
+
+    heroTitle: 'თვითმომსახურების სამრეცხაო',
+    tabLoyalty: '⭐ ბარათი', tabPrices: '🏷️ ფასები', tabPhoto: '📸 ფოტო', tabQr: '🎁 შაბათი', tabHowto: '🧼 ინსტრ.',
+    cardTitle: '📱 ჩემი ლოიალობის ბარათი',
+    remember: 'ნომრის დამახსოვრება', clearSaved: 'გასუფთავება',
+    promo: 'ყოველი მე-10 რეცხვა — <span style="color:#4ade80;">უფასოა!</span>',
+    lastVisits: 'ბოლო ვიზიტები:', opNote: 'რეცხვის ჩამატება ოპერატორთანაა 🛠️',
+    shareBtn: '🔗 ბარათის გაზიარება', shareMsg: 'ჩემი სამრეცხაო ბარათი — ნომერი: ',
+    comboLabel: 'კომბო: 3 აქსესუარი', comboSub: 'მტვერსასრუტი · ბორბლები · ხალიჩა',
+    nightTitle: 'ღამის ტარიფი', nightHours: '00:00 – 08:00 ყოველდღე',
+    accTitle: 'აქსესუარები ცალ-ცალკე',
+    photoTitle: '📸 მანქანის ფოტო', photoDesc: 'გადაიღე შედეგი და გამოგვიგზავნე — ღამის გალერეაში გამოჩნდება! 🌙',
+    choosePhoto: 'დააჭირე ფოტოს ასარჩევად', sendBtn: 'გაგზავნა',
+    couponTitle: '🎁 შაბათის კუპონი', scanLbl: 'სკანირება → შაბათის სპეციალური ფასდაკლება',
+    loyaltyProg: 'ლოიალობის პროგრამა', loyaltyDesc: 'ყოველი მე-10 რეცხვა → <strong>1 უფასო 🎉</strong>',
+    loyaltyHint: '"ჩემი ბარათი" ჩანართში შეიყვანე ნომერი', footer: '24/7 · თვითმომსახურება · ხარისხი',
+    normalTariff: 'ჩვეულებრივი ტარიფი', nightActive: '🌙 ღამის ტარიფი აქტიური',
+    errPhone: 'შეიყვანე სწორი ნომერი', errConn: 'კავშირის შეცდომა. სცადე ხელახლა.',
+    free: '🎁 მილოცავ! უფასო რეცხვა გაქვს!',
+    progressFree: function(count){ return 'მილოცავ! უფასო რეცხვა გაქვს! სულ: ' + count; },
+    progressOn: function(pos, rem){ return 'მე-' + (pos+1) + ' რეცხვაზე ხარ - კიდევ ' + rem + ' უფასომდე'; },
+    checking: '⏳ ვამოწმებ...',
+    photoErrPhone: 'შეიყვანე ნომერი', photoErrName: 'შეიყვანე სახელი და გვარი', photoErrFile: 'აირჩიე ფოტო',
+    photoErrNotReg: '❌ ეს ნომერი არ არის დარეგისტრირებული. ჯერ ლოიალობის ბარათი გახსენი.',
+    photoUploading: '⏳ იტვირთება...', photoOk: '✅ ფოტო გაიგზავნა! მადლობა 🚗',
+    photoErr: 'შეცდომა. სცადე ხელახლა.', photoChecking: '⏳ ვამოწმებ ნომერს...',
+    savedBanner: '📱 შენახული: ',
+    vacuum: '🌀 მტვერსასრუტი', wheels: '⚙️ ბორბლები', carpet: '🟫 ხალიჩა',
+    washNormalLbl: 'ჩვეულებრივი', washNightLbl: 'ღამის ფასი',
+    howtoTitle: '🧼 როგორ ვირეცხოთ',
+    howtoSteps: [
+      { icon: '🧼', title: 'ქაფი', text: 'მიასხურეთ აქტიური ქაფი მშრალ მანქანას ქვემოდან ზემოთ. დაელოდეთ 2 წუთი, რომ ჭუჭყი დარბილდეს.' },
+      { icon: '🚿', title: 'გარეცხვა', text: 'ჩამორეცხეთ ქაფი წყლის ძლიერი ჭავლით. დაიწყეთ სახურავიდან და ჩამოდით ქვემოთ.' },
+      { icon: '✨', title: 'ცვილი', text: '(რეკომენდირებული): გადაატარეთ დამცავი ცვილი ბზინვარებისა და წყალგამძლეობისთვის.' },
+      { icon: '💧', title: 'ოსმოსი', text: 'გადაავლეთ ოსმოსური (გაფილტრული) წყალი. ის არ ტოვებს ლაქებს, ამიტომ მანქანის გამშრალება საჭირო აღარ არის.' }
+    ]
+  },
+  en: {
+    heroTitle: 'Self-Service Car Wash',
+    tabLoyalty: '⭐ Card', tabPrices: '🏷️ Prices', tabPhoto: '📸 Photo', tabQr: '🎁 Saturday', tabHowto: '🧼 How-to',
+    cardTitle: '📱 My Loyalty Card',
+    remember: 'Remember my number', clearSaved: 'Clear',
+    promo: 'Every 10th wash — <span style="color:#4ade80;">FREE!</span>',
+    lastVisits: 'Recent visits:', opNote: 'Washes added by operator 🛠️',
+    shareBtn: '🔗 Share my card', shareMsg: 'My car wash loyalty card — number: ',
+    comboLabel: 'Combo: 3 accessories', comboSub: 'Vacuum · Wheels · Carpet',
+    nightTitle: 'Night tariff', nightHours: 'Every day 00:00 – 08:00',
+    accTitle: 'Accessories separately',
+    photoTitle: '📸 Car photo', photoDesc: 'Take a photo of your clean car and send it to us — it will appear in our gallery! 🌙',
+    choosePhoto: 'Tap to choose a photo', sendBtn: 'Send',
+    couponTitle: '🎁 Saturday coupon', scanLbl: 'Scan → Saturday special discount',
+    loyaltyProg: 'Loyalty programme', loyaltyDesc: 'Every 10th wash → <strong>1 free 🎉</strong>',
+    loyaltyHint: 'Enter your number in the "Card" tab', footer: '24/7 · Self-service · Quality',
+    normalTariff: 'Regular tariff', nightActive: '🌙 Night tariff active',
+    errPhone: 'Enter a valid number', errConn: 'Connection error. Please try again.',
+    free: '🎁 Congratulations! You have a free wash!',
+    progressFree: function(count){ return 'Congratulations! Free wash! Total: ' + count; },
+    progressOn: function(pos, rem){ return 'You\'re on wash ' + (pos+1) + ' — ' + rem + ' more to free!'; },
+    checking: '⏳ Checking...',
+    photoErrPhone: 'Enter your number', photoErrName: 'Enter your name', photoErrFile: 'Choose a photo',
+    photoErrNotReg: '❌ This number is not registered. Open your loyalty card first.',
+    photoUploading: '⏳ Uploading...', photoOk: '✅ Photo sent! Thank you 🚗',
+    photoErr: 'Error. Please try again.', photoChecking: '⏳ Checking number...',
+    savedBanner: '📱 Saved: ',
+    vacuum: '🌀 Vacuum', wheels: '⚙️ Wheels', carpet: '🟫 Carpet',
+    washNormalLbl: 'Regular', washNightLbl: 'Night price',
+    howtoTitle: '🧼 How to Wash',
+    howtoSteps: [
+      { icon: '🧼', title: 'Foam', text: 'Spray active foam on the dry car from bottom to top. Wait 2 minutes for the dirt to soften.' },
+      { icon: '🚿', title: 'Rinse', text: 'Rinse off the foam with a strong jet of water. Start from the roof and work downward.' },
+      { icon: '✨', title: 'Wax', text: '(Recommended): Apply protective wax for shine and water resistance.' },
+      { icon: '💧', title: 'Osmosis', text: 'Apply osmosis (filtered) water. It leaves no spots, so drying the car is not necessary.' }
+    ]
+  }
+};
+
+function t(key) { return T[currentLang][key] || T.ka[key] || key; }
+
+/* ===== LANGUAGE ===== */
+function setLang(lang, el) {
+  currentLang = lang;
+  localStorage.setItem('samrecxao_lang', lang);
+  document.querySelectorAll('.lang-btn').forEach(function(b){ b.classList.remove('active'); });
+  el.classList.add('active');
+  applyTranslations();
+}
+
+function applyTranslations() {
+  document.getElementById('hero-title').textContent = t('heroTitle');
+  document.getElementById('tab-btn-loyalty').textContent = t('tabLoyalty');
+  document.getElementById('tab-btn-prices').textContent = t('tabPrices');
+  document.getElementById('tab-btn-photo').textContent = t('tabPhoto');
+  document.getElementById('tab-btn-qr').textContent = t('tabQr');
+  document.getElementById('tab-btn-howto').textContent = t('tabHowto');
+  document.getElementById('lbl-card-title').textContent = t('cardTitle');
+  document.getElementById('lbl-remember').textContent = t('remember');
+  document.getElementById('lbl-clear').textContent = t('clearSaved');
+  document.getElementById('lbl-promo').innerHTML = t('promo');
+  document.getElementById('lbl-last-visits').textContent = t('lastVisits');
+  document.getElementById('lbl-op-note').textContent = t('opNote');
+  document.getElementById('share-btn').textContent = t('shareBtn');
+  document.getElementById('combo-label').innerHTML = t('comboLabel') + '<small>' + t('comboSub') + '</small>';
+  document.getElementById('night-title').textContent = t('nightTitle');
+  document.getElementById('night-hours').textContent = t('nightHours');
+  document.getElementById('acc-title').textContent = t('accTitle');
+  // acc pills updated via applyPrices() with live prices
+  document.getElementById('photo-title').textContent = t('photoTitle');
+  document.getElementById('photo-desc').textContent = t('photoDesc');
+  document.getElementById('lbl-choose-photo').textContent = t('choosePhoto');
+  document.getElementById('lbl-send').textContent = t('sendBtn');
+  document.getElementById('lbl-coupon-title').textContent = t('couponTitle');
+  document.getElementById('lbl-scan').textContent = t('scanLbl');
+  document.getElementById('lbl-loyalty-prog').textContent = t('loyaltyProg');
+  document.getElementById('lbl-loyalty-desc').innerHTML = t('loyaltyDesc');
+  document.getElementById('lbl-loyalty-hint').textContent = t('loyaltyHint');
+  document.getElementById('footer-txt').textContent = t('footer');
+  var wnl = document.getElementById('lbl-wash-normal');
+  var wntl = document.getElementById('lbl-wash-night');
+  if (wnl) wnl.textContent = t('washNormalLbl');
+  if (wntl) wntl.textContent = t('washNightLbl');
+  updateTime();
+  applyPrices();
+  // re-render progress if stamps are shown
+  if (document.getElementById('stamp-section').style.display !== 'none') {
+    renderStamps(parseInt(document.getElementById('progress-text').dataset.count || '0'));
+  }
+  // re-render howto if tab is open
+  document.getElementById('howto-title').textContent = t('howtoTitle');
+  if (document.getElementById('tab-howto').classList.contains('active')) {
+    loadHowTo();
+  }
+}
+
+/* ===== SAVED NUMBER ===== */
+function loadSavedNumber() {
+  var saved = localStorage.getItem('samrecxao_phone');
+  if (saved) {
+    document.getElementById('phone-input').value = saved;
+    document.getElementById('remember-me').checked = true;
+    document.getElementById('saved-banner').style.display = 'flex';
+    document.getElementById('saved-banner-txt').textContent = t('savedBanner') + saved;
+  }
+}
+
+function clearSaved() {
+  localStorage.removeItem('samrecxao_phone');
+  document.getElementById('phone-input').value = '';
+  document.getElementById('remember-me').checked = false;
+  document.getElementById('saved-banner').style.display = 'none';
+  document.getElementById('stamp-section').style.display = 'none';
+  document.getElementById('loyalty-result').style.display = 'none';
+}
+
+/* ===== SHARE ===== */
+function shareCard() {
+  var phone = currentPhone || document.getElementById('phone-input').value.trim();
+  if (!phone) return;
+  var msg = t('shareMsg') + phone;
+  if (navigator.share) {
+    navigator.share({ title: 'სამრეცხაო ბარათი', text: msg, url: window.location.href });
+  } else {
+    navigator.clipboard ? navigator.clipboard.writeText(msg).then(function(){ alert('ბმული დაკოპირდა!'); }) : prompt('კოპირება:', msg);
+  }
+}
+
+/* ===== TABS ===== */
+function showTab(name, el) {
+  document.querySelectorAll('.tab-content').forEach(function(t){ t.classList.remove('active'); });
+  document.querySelectorAll('.tab').forEach(function(t){ t.classList.remove('active'); });
+  document.getElementById('tab-' + name).classList.add('active');
+  el.classList.add('active');
+  if (name === 'howto') loadHowTo();
+}
+
+/* ===== RESULT HELPERS ===== */
+function showResult(msg, type) {
+  var el = document.getElementById('loyalty-result');
+  el.className = 'result-box ' + type;
+  el.innerHTML = msg;
+  el.style.display = 'block';
+}
+
+function showPhotoResult(msg, type) {
+  var el = document.getElementById('photo-result');
+  el.className = 'result-box ' + type;
+  el.innerHTML = msg;
+  el.style.display = msg ? 'block' : 'none';
+}
+
+/* ===== STAMPS ===== */
+function renderStamps(count) {
+  document.getElementById('progress-text').dataset.count = count;
+  var html = '', pos = count % 10;
+  for (var i = 1; i <= 10; i++) {
+    if (i === 10) {
+      html += (count > 0 && count % 10 === 0)
+        ? '<div class="stamp free-done">🎁</div>'
+        : '<div class="stamp free-slot" style="font-size:13px;font-weight:700;">10</div>';
+    } else if (i <= pos) {
+      html += '<div class="stamp filled" style="font-size:13px;font-weight:700;">' + i + '</div>';
+    } else {
+      html += '<div class="stamp" style="font-size:13px;color:#c8d3e0;">' + i + '</div>';
+    }
+  }
+  document.getElementById('stamps-display').innerHTML = html;
+  var rem = pos === 0 ? (count > 0 ? 0 : 10) : 10 - pos;
+  document.getElementById('progress-text').textContent = (count > 0 && count % 10 === 0)
+    ? t('progressFree')(count)
+    : t('progressOn')(pos, rem);
+}
+
+/* ===== SCREENSHOT / CARD GENERATOR ===== */
+function takeScreenshot() {
+  var phone = currentPhone || document.getElementById('phone-input').value.trim();
+  if (!phone) { alert('ჯერ ნომერი შეიყვანე'); return; }
+
+  var count = parseInt(document.getElementById('progress-text').dataset.count || '0');
+  var pos = count % 10;
+
+  var W = 800, H = 520;
+  var canvas = document.createElement('canvas');
+  canvas.width = W; canvas.height = H;
+  var ctx = canvas.getContext('2d');
+
+  // Background gradient
+  var bg = ctx.createLinearGradient(0, 0, W, H);
+  bg.addColorStop(0, '#0a1628');
+  bg.addColorStop(1, '#1a3a6e');
+  ctx.fillStyle = bg;
+  roundRect(ctx, 0, 0, W, H, 32);
+  ctx.fill();
+
+  // Decorative circle top-right
+  ctx.beginPath();
+  ctx.arc(W - 60, -30, 130, 0, Math.PI * 2);
+  ctx.fillStyle = 'rgba(255,255,255,0.04)';
+  ctx.fill();
+
+  // Decorative circle bottom-left
+  ctx.beginPath();
+  ctx.arc(60, H + 30, 120, 0, Math.PI * 2);
+  ctx.fillStyle = 'rgba(255,255,255,0.04)';
+  ctx.fill();
+
+  // Title
+  ctx.fillStyle = 'rgba(255,255,255,0.5)';
+  ctx.font = '600 22px Segoe UI, sans-serif';
+  ctx.fillText('თვითმომსახურების სამრეცხაო', 48, 62);
+
+  // Card label
+  ctx.fillStyle = '#fff';
+  ctx.font = '700 38px Segoe UI, sans-serif';
+  ctx.fillText('📱 ლოიალობის ბარათი', 48, 120);
+
+  // Phone number
+  ctx.fillStyle = '#7dd3fc';
+  ctx.font = '600 28px Segoe UI, sans-serif';
+  ctx.fillText(phone, 48, 168);
+
+  // Divider
+  ctx.strokeStyle = 'rgba(255,255,255,0.12)';
+  ctx.lineWidth = 1;
+  ctx.beginPath();
+  ctx.moveTo(48, 192); ctx.lineTo(W - 48, 192);
+  ctx.stroke();
+
+  // Promo label
+  ctx.fillStyle = 'rgba(255,255,255,0.55)';
+  ctx.font = '500 18px Segoe UI, sans-serif';
+  ctx.fillText('ყოველი მე-10 რეცხვა — უფასოა! 🎁', 48, 228);
+
+  // Stamps
+  var stampX = 48, stampY = 260, stampR = 26, stampGap = 64;
+  for (var i = 1; i <= 10; i++) {
+    var cx = stampX + (i - 1) * stampGap + stampR;
+    var cy = stampY + stampR;
+    ctx.beginPath();
+    ctx.arc(cx, cy, stampR, 0, Math.PI * 2);
+    if (i === 10) {
+      if (count > 0 && count % 10 === 0) {
+        ctx.fillStyle = '#16a34a';
+        ctx.fill();
+        ctx.fillStyle = '#fff';
+        ctx.font = '700 22px Segoe UI, sans-serif';
+        ctx.textAlign = 'center';
+        ctx.fillText('🎁', cx, cy + 8);
+        ctx.textAlign = 'left';
+      } else {
+        ctx.strokeStyle = '#4ade80';
+        ctx.lineWidth = 2;
+        ctx.setLineDash([4, 4]);
+        ctx.stroke();
+        ctx.setLineDash([]);
+        ctx.fillStyle = '#4ade8066';
+        ctx.fill();
+        ctx.fillStyle = '#4ade80';
+        ctx.font = '700 16px Segoe UI, sans-serif';
+        ctx.textAlign = 'center';
+        ctx.fillText('10', cx, cy + 6);
+        ctx.textAlign = 'left';
+      }
+    } else if (i <= pos) {
+      ctx.fillStyle = '#0a1628';
+      ctx.fill();
+      ctx.strokeStyle = '#7dd3fc';
+      ctx.lineWidth = 2.5;
+      ctx.stroke();
+      ctx.fillStyle = '#7dd3fc';
+      ctx.font = '700 18px Segoe UI, sans-serif';
+      ctx.textAlign = 'center';
+      ctx.fillText(i, cx, cy + 7);
+      ctx.textAlign = 'left';
+    } else {
+      ctx.strokeStyle = 'rgba(255,255,255,0.2)';
+      ctx.lineWidth = 1.5;
+      ctx.setLineDash([4, 4]);
+      ctx.stroke();
+      ctx.setLineDash([]);
+      ctx.fillStyle = 'rgba(255,255,255,0.05)';
+      ctx.fill();
+      ctx.fillStyle = 'rgba(255,255,255,0.25)';
+      ctx.font = '600 16px Segoe UI, sans-serif';
+      ctx.textAlign = 'center';
+      ctx.fillText(i, cx, cy + 7);
+      ctx.textAlign = 'left';
+    }
+  }
+
+  // Progress text
+  var rem = pos === 0 ? (count > 0 ? 0 : 10) : 10 - pos;
+  var progTxt = (count > 0 && count % 10 === 0)
+    ? '🎉 უფასო რეცხვა გაქვს! სულ: ' + count
+    : 'კიდევ ' + rem + ' რეცხვა უფასო რეცხვამდე · სულ: ' + count;
+  ctx.fillStyle = 'rgba(255,255,255,0.6)';
+  ctx.font = '500 17px Segoe UI, sans-serif';
+  ctx.fillText(progTxt, 48, 370);
+
+  // Bottom bar
+  ctx.fillStyle = 'rgba(0,0,0,0.25)';
+  roundRectBottom(ctx, 0, H - 72, W, 72, 32);
+  ctx.fill();
+
+  ctx.fillStyle = 'rgba(255,255,255,0.35)';
+  ctx.font = '500 16px Segoe UI, sans-serif';
+  ctx.fillText('24/7 · თვითმომსახურება · ხარისხი', 48, H - 38);
+
+  // Download
+  var link = document.createElement('a');
+  link.download = 'barathi-' + phone + '.png';
+  link.href = canvas.toDataURL('image/png');
+  link.click();
+}
+
+function roundRect(ctx, x, y, w, h, r) {
+  ctx.beginPath();
+  ctx.moveTo(x + r, y);
+  ctx.lineTo(x + w - r, y);
+  ctx.quadraticCurveTo(x + w, y, x + w, y + r);
+  ctx.lineTo(x + w, y + h - r);
+  ctx.quadraticCurveTo(x + w, y + h, x + w - r, y + h);
+  ctx.lineTo(x + r, y + h);
+  ctx.quadraticCurveTo(x, y + h, x, y + h - r);
+  ctx.lineTo(x, y + r);
+  ctx.quadraticCurveTo(x, y, x + r, y);
+  ctx.closePath();
+}
+
+function roundRectBottom(ctx, x, y, w, h, r) {
+  ctx.beginPath();
+  ctx.moveTo(x, y);
+  ctx.lineTo(x + w, y);
+  ctx.lineTo(x + w, y + h - r);
+  ctx.quadraticCurveTo(x + w, y + h, x + w - r, y + h);
+  ctx.lineTo(x + r, y + h);
+  ctx.quadraticCurveTo(x, y + h, x, y + h - r);
+  ctx.lineTo(x, y);
+  ctx.closePath();
+}
+
+/* ===== CHECK CARD ===== */
+function checkCard() {
+  var phone = document.getElementById('phone-input').value.trim();
+  if (!phone || phone.length < 9) { showResult(t('errPhone'), 'error'); return; }
+  currentPhone = phone;
+
+  // Save if checked
+  if (document.getElementById('remember-me').checked) {
+    localStorage.setItem('samrecxao_phone', phone);
+    document.getElementById('saved-banner').style.display = 'flex';
+    document.getElementById('saved-banner-txt').textContent = t('savedBanner') + phone;
+  }
+
+  showResult(t('checking'), 'info');
+  document.getElementById('stamp-section').style.display = 'none';
+
+  fetch(BASE_URL + '/latest', { headers: { 'X-Master-Key': API_KEY } })
+    .then(function(r){ return r.json(); })
+    .then(function(r){
+      allData = r.record || {};
+      var entry = allData[phone] || { count: 0, history: [] };
+      var count = entry.count;
+      document.getElementById('loyalty-result').style.display = 'none';
+      document.getElementById('stamp-section').style.display = 'block';
+      renderStamps(count);
+
+      // Show visit history
+      var history = entry.history || [];
+      if (history.length > 0) {
+        var last5 = history.slice(-5).reverse();
+        document.getElementById('visit-list').innerHTML = last5.map(function(d){
+          return '<div class="visit-item"><span>🚗 რეცხვა</span><span>' + d + '</span></div>';
+        }).join('');
+        document.getElementById('visit-history').style.display = 'block';
+      } else {
+        document.getElementById('visit-history').style.display = 'none';
+      }
+
+      if (count > 0 && count % 10 === 0) { showResult(t('free'), 'free'); }
+    })
+    .catch(function(){ showResult(t('errConn'), 'error'); });
+}
+
+/* ===== PHOTO ===== */
+function previewPhoto(input) {
+  if (!input.files || !input.files[0]) return;
+  var reader = new FileReader();
+  reader.onload = function(e) {
+    document.getElementById('preview-img').src = e.target.result;
+    document.getElementById('photo-preview').style.display = 'block';
+    document.getElementById('photo-drop').style.borderColor = '#0a1628';
+  };
+  reader.readAsDataURL(input.files[0]);
+}
+
+function uploadPhoto() {
+  var phone = document.getElementById('photo-phone').value.trim();
+  var fullName = document.getElementById('photo-name').value.trim();
+  var file = document.getElementById('photo-file').files[0];
+  if (!phone || phone.length < 9) { showPhotoResult(t('photoErrPhone'), 'error'); return; }
+  if (!fullName) { showPhotoResult(t('photoErrName'), 'error'); return; }
+  if (!file) { showPhotoResult(t('photoErrFile'), 'error'); return; }
+
+  var btn = document.getElementById('upload-btn');
+  btn.disabled = true;
+  document.getElementById('lbl-send').textContent = t('photoUploading');
+  showPhotoResult('', '');
+
+  doUpload(phone, fullName, file, btn);
+}
+
+function doUpload(phone, fullName, file, btn) {
+  var reader = new FileReader();
+  reader.onload = function(e) {
+    var base64 = e.target.result.split(',')[1];
+    var fd = new FormData();
+    fd.append('key', IMGBB_KEY);
+    fd.append('image', base64);
+
+    fetch('https://api.imgbb.com/1/upload', { method: 'POST', body: fd })
+      .then(function(r){ return r.json(); })
+      .then(function(res) {
+        if (!res.success) throw new Error('imgbb error');
+        var imgUrl = res.data.url;
+        var now = new Date();
+        var dateStr = now.getFullYear() + '-' + String(now.getMonth()+1).padStart(2,'0') + '-' + String(now.getDate()).padStart(2,'0') + ' ' + String(now.getHours()).padStart(2,'0') + ':' + String(now.getMinutes()).padStart(2,'0');
+
+        return fetch('https://api.jsonbin.io/v3/b/' + PHOTOS_BIN_ID + '/latest', {
+          headers: { 'X-Master-Key': API_KEY }
+        }).then(function(r){ return r.json(); }).then(function(r) {
+          var photos = r.record && r.record.photos ? r.record.photos : [];
+          photos.unshift({ phone: phone, name: fullName, url: imgUrl, time: dateStr, approved: false });
+          return fetch('https://api.jsonbin.io/v3/b/' + PHOTOS_BIN_ID, {
+            method: 'PUT',
+            headers: { 'Content-Type': 'application/json', 'X-Master-Key': API_KEY },
+            body: JSON.stringify({ photos: photos })
+          });
+        });
+      })
+      .then(function() {
+        btn.disabled = false;
+        document.getElementById('lbl-send').textContent = t('sendBtn');
+        showPhotoResult(t('photoOk'), 'success');
+        document.getElementById('photo-preview').style.display = 'none';
+        document.getElementById('photo-file').value = '';
+        document.getElementById('photo-name').value = '';
+        document.getElementById('photo-drop').style.borderColor = '#c8d3e0';
+      })
+      .catch(function() {
+        btn.disabled = false;
+        document.getElementById('lbl-send').textContent = t('sendBtn');
+        showPhotoResult(t('photoErr'), 'error');
+      });
+  };
+  reader.readAsDataURL(file);
+}
+
+/* ===== HOW-TO ===== */
+var DEFAULT_HOWTO = [
+  { icon: '🧼', title: 'ქაფი', text: 'მიასხურეთ აქტიური ქაფი მშრალ მანქანას ქვემოდან ზემოთ. დაელოდეთ 2 წუთი, რომ ჭუჭყი დარბილდეს.' },
+  { icon: '🚿', title: 'გარეცხვა', text: 'ჩამორეცხეთ ქაფი წყლის ძლიერი ჭავლით. დაიწყეთ სახურავიდან და ჩამოდით ქვემოთ.' },
+  { icon: '✨', title: 'ცვილი', text: '(რეკომენდირებული): გადაატარეთ დამცავი ცვილი ბზინვარებისა და წყალგამძლეობისთვის.' },
+  { icon: '💧', title: 'ოსმოსი', text: 'გადაავლეთ ოსმოსური (გაფილტრული) წყალი. ის არ ტოვებს ლაქებს, ამიტომ მანქანის გამშრალება საჭირო აღარ არის.' }
+];
+
+function loadHowTo() {
+  // EN — use built-in translated steps directly
+  if (currentLang === 'en') {
+    renderHowTo(T.en.howtoSteps);
+    return;
+  }
+  // KA — load from jsonbin (admin can edit), fallback to DEFAULT
+  fetch(BASE_URL + '/latest', { headers: { 'X-Master-Key': API_KEY } })
+    .then(function(r){ return r.json(); })
+    .then(function(r) {
+      var data = r.record || {};
+      var steps = data['_howto'] || DEFAULT_HOWTO;
+      renderHowTo(steps);
+    })
+    .catch(function() { renderHowTo(DEFAULT_HOWTO); });
+}
+
+function renderHowTo(steps) {
+  var html = '';
+  steps.forEach(function(step, idx) {
+    html += '<div style="display:flex;gap:14px;align-items:flex-start;padding:14px 0;' +
+      (idx < steps.length - 1 ? 'border-bottom:1px solid #f0f4f8;' : '') + '">' +
+      '<div style="width:44px;height:44px;background:#0a1628;border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:22px;flex-shrink:0;">' +
+      step.icon + '</div>' +
+      '<div><p style="font-size:14px;font-weight:700;color:#0a1628;margin-bottom:4px;">' +
+      step.title + '</p>' +
+      '<p style="font-size:13px;color:#374151;line-height:1.6;margin:0;">' + step.text + '</p></div></div>';
+  });
+  document.getElementById('howto-content').innerHTML = html;
+}
+
+/* ===== TIME ===== */
+function updateTime() {
+  var now = new Date(), h = now.getHours(), m = now.getMinutes();
+  document.getElementById('live-time').textContent = (h<10?'0'+h:h) + ':' + (m<10?'0'+m:m);
+  var isNight = h >= 0 && h < 8;
+  document.getElementById('live-lbl').textContent = isNight ? t('nightActive') : t('normalTariff');
+  var disc = document.getElementById('night-disc');
+  var pct = (currentPrices && currentPrices.nightDisc) ? currentPrices.nightDisc : 20;
+  disc.style.background = isNight ? '#4ade80' : '#bae6fd';
+  disc.style.color = isNight ? '#052e16' : '#0a1628';
+  disc.textContent = isNight ? '-' + pct + '%!' : '-' + pct + '%';
+}
+
+/* ===== INIT ===== */
+var savedLang = localStorage.getItem('samrecxao_lang') || 'ka';
+currentLang = savedLang;
+document.querySelectorAll('.lang-btn').forEach(function(b){
+  if (b.textContent.trim().toLowerCase() === savedLang || (savedLang==='ka'&&b.textContent.includes('ქა')) || (savedLang==='ru'&&b.textContent.includes('РУ')) || (savedLang==='en'&&b.textContent.includes('EN'))) b.classList.add('active');
+  else b.classList.remove('active');
+});
+applyTranslations();
+loadSavedNumber();
+updateTime();
+setInterval(updateTime, 30000);
+loadPrices();
+document.getElementById('phone-input').addEventListener('keydown', function(e){ if(e.key==='Enter') checkCard(); });
+</script>
+</body>
+</html>

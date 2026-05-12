@@ -1,0 +1,1018 @@
+<!DOCTYPE html>
+<html lang="ka">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>ადმინ პანელი — სამრეცხაო</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0;}
+body{font-family:'Segoe UI',sans-serif;background:#0a1628;min-height:100vh;display:flex;align-items:center;justify-content:center;padding:16px;}
+.login-box{background:#fff;border-radius:20px;padding:2rem 1.5rem;width:100%;max-width:360px;text-align:center;box-shadow:0 20px 60px rgba(0,0,0,0.4);}
+.login-box h2{font-size:20px;color:#0a1628;margin-bottom:6px;}
+.login-box p{font-size:13px;color:#6b7a90;margin-bottom:20px;}
+.pin-input{font-size:28px;letter-spacing:12px;text-align:center;width:100%;padding:14px;border:2px solid #d1dae6;border-radius:12px;outline:none;color:#0a1628;margin-bottom:12px;font-weight:700;}
+.pin-input:focus{border-color:#0a1628;}
+.btn-login{width:100%;background:#0a1628;color:#fff;border:none;border-radius:12px;padding:13px;font-size:15px;font-weight:700;cursor:pointer;}
+.err{color:#dc2626;font-size:13px;margin-top:8px;display:none;}
+
+/* Admin panel */
+.admin-wrap{display:none;max-width:520px;margin:0 auto;padding:16px;background:#f0f4f8;min-height:100vh;}
+.hero{background:#0a1628;color:#fff;padding:1.5rem;text-align:center;border-radius:18px;margin-bottom:14px;position:relative;overflow:hidden;}
+.hero h1{font-size:20px;font-weight:700;}
+.hero p{font-size:12px;opacity:0.55;margin-top:4px;}
+.badge{display:inline-block;background:#4ade80;color:#052e16;font-size:11px;font-weight:700;border-radius:20px;padding:3px 10px;margin-bottom:8px;}
+.card{background:#fff;border:1px solid #e2e8f0;border-radius:16px;padding:1.25rem;margin-bottom:12px;box-shadow:0 1px 3px rgba(0,0,0,0.04);}
+.card-title{display:flex;align-items:center;gap:8px;font-size:15px;font-weight:600;margin-bottom:14px;color:#0a1628;}
+.input-row{display:flex;gap:8px;margin-bottom:10px;}
+.input-row input{flex:1;padding:11px 14px;border:1px solid #d1dae6;border-radius:10px;font-size:15px;background:#f8fafc;color:#0a1628;outline:none;transition:border 0.15s;}
+.input-row input:focus{border-color:#0a1628;}
+.btn-primary{background:#0a1628;color:#fff;border:none;border-radius:10px;padding:11px 16px;font-size:14px;font-weight:600;cursor:pointer;}
+.btn-wash{width:100%;padding:14px;font-size:15px;border-radius:12px;background:#16a34a;color:#fff;border:none;cursor:pointer;font-weight:700;margin-top:10px;display:flex;align-items:center;justify-content:center;gap:8px;}
+.btn-wash:disabled{opacity:0.4;cursor:not-allowed;}
+.btn-danger{background:#fef2f2;color:#dc2626;border:1px solid #fca5a5;border-radius:10px;padding:11px 16px;font-size:14px;font-weight:600;cursor:pointer;}
+.stamps{display:flex;gap:8px;flex-wrap:wrap;margin:12px 0 8px;}
+.stamp{width:40px;height:40px;border-radius:50%;border:2px dashed #c8d3e0;display:flex;align-items:center;justify-content:center;font-size:18px;}
+.stamp.filled{background:#0a1628;border-color:#0a1628;color:#7dd3fc;}
+.stamp.free-slot{border-color:#4ade80;color:#4ade80;opacity:0.4;}
+.stamp.free-done{background:#16a34a;border-color:#16a34a;color:#fff;}
+.progress-text{font-size:13px;color:#6b7a90;}
+.result-box{border-radius:10px;padding:12px 14px;font-size:14px;margin-top:10px;display:none;}
+.result-box.success{background:#f0fdf4;border:1px solid #86efac;color:#166534;}
+.result-box.free{background:#fef3c7;border:1px solid #fbbf24;color:#92400e;}
+.result-box.error{background:#fef2f2;border:1px solid #fca5a5;color:#991b1b;}
+.result-box.info{background:#eff6ff;border:1px solid #93c5fd;color:#1e40af;}
+.spinner{width:18px;height:18px;border:2px solid rgba(255,255,255,0.3);border-top:2px solid #fff;border-radius:50%;animation:spin 0.8s linear infinite;}
+@keyframes spin{to{transform:rotate(360deg);}}
+.logout-btn{background:rgba(255,255,255,0.1);border:1px solid rgba(255,255,255,0.2);color:#fff;border-radius:8px;padding:5px 12px;font-size:12px;cursor:pointer;position:absolute;top:1rem;right:1rem;}
+
+/* Stats */
+.stat-row{display:flex;gap:10px;margin-bottom:14px;}
+.stat-box{flex:1;background:#f0f4f8;border-radius:12px;padding:12px;text-align:center;}
+.stat-num{font-size:26px;font-weight:700;color:#0a1628;}
+.stat-lbl{font-size:11px;color:#6b7a90;margin-top:2px;}
+.history-item{padding:8px 0;border-bottom:1px solid #f0f4f8;font-size:13px;color:#374151;display:flex;justify-content:space-between;}
+.history-item:last-child{border-bottom:none;}
+
+/* Photos */
+.photo-card{background:#fff;border:1px solid #e2e8f0;border-radius:14px;overflow:hidden;margin-bottom:12px;}
+.photo-card img{width:100%;max-height:260px;object-fit:cover;display:block;}
+.photo-meta{padding:10px 14px;display:flex;justify-content:space-between;align-items:center;gap:8px;flex-wrap:wrap;}
+.photo-phone{font-size:14px;font-weight:700;color:#0a1628;}
+.photo-time{font-size:11px;color:#6b7a90;}
+.btn-approve{background:#16a34a;color:#fff;border:none;border-radius:8px;padding:7px 14px;font-size:12px;font-weight:700;cursor:pointer;}
+.btn-delete{background:#fef2f2;color:#dc2626;border:1px solid #fca5a5;border-radius:8px;padding:7px 12px;font-size:12px;font-weight:700;cursor:pointer;}
+.approved-badge{background:#f0fdf4;color:#16a34a;border:1px solid #86efac;border-radius:8px;padding:5px 10px;font-size:12px;font-weight:700;}
+
+/* Tabs */
+.admin-tabs{display:flex;gap:6px;margin-bottom:14px;flex-wrap:wrap;}
+.admin-tab{flex:1;min-width:70px;padding:10px 4px;border-radius:12px;border:1px solid #d1dae6;background:#fff;font-size:11px;cursor:pointer;text-align:center;color:#6b7a90;}
+.admin-tab.active{background:#0a1628;color:#fff;border-color:#0a1628;}
+.section{display:none;}
+.section.active{display:block;}
+
+/* Clients list */
+.client-item{padding:10px 12px;border:1px solid #e2e8f0;border-radius:12px;margin-bottom:8px;display:flex;justify-content:space-between;align-items:center;background:#fff;cursor:pointer;transition:border-color 0.15s;}
+.client-item:hover{border-color:#0a1628;}
+.client-item.free-due{border-left:4px solid #f59e0b;background:#fffbeb;}
+.client-phone{font-size:14px;font-weight:700;color:#0a1628;}
+.client-meta{font-size:11px;color:#6b7a90;margin-top:2px;}
+.client-badge{font-size:11px;font-weight:700;background:#f0f4f8;border-radius:8px;padding:4px 10px;color:#0a1628;}
+.client-badge.free{background:#fef3c7;color:#92400e;}
+.search-input{width:100%;padding:11px 14px;border:1px solid #d1dae6;border-radius:10px;font-size:15px;background:#f8fafc;color:#0a1628;outline:none;margin-bottom:12px;}
+.search-input:focus{border-color:#0a1628;}
+.filter-row{display:flex;gap:6px;margin-bottom:12px;}
+.filter-btn{padding:7px 14px;border-radius:20px;border:1px solid #d1dae6;background:#fff;font-size:12px;cursor:pointer;color:#6b7a90;}
+.filter-btn.active{background:#0a1628;color:#fff;border-color:#0a1628;}
+
+/* Stats dashboard */
+.big-stat-row{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:14px;}
+.big-stat{background:#fff;border:1px solid #e2e8f0;border-radius:14px;padding:16px;text-align:center;}
+.big-stat-num{font-size:32px;font-weight:700;color:#0a1628;}
+.big-stat-lbl{font-size:12px;color:#6b7a90;margin-top:4px;}
+.chart-bar-wrap{display:flex;align-items:flex-end;gap:4px;height:80px;padding:0 4px;}
+.chart-bar{flex:1;background:#0a1628;border-radius:4px 4px 0 0;min-height:4px;transition:height 0.4s;}
+.chart-labels{display:flex;gap:4px;padding:0 4px;margin-top:4px;}
+.chart-label{flex:1;text-align:center;font-size:9px;color:#6b7a90;}
+
+/* Edit modal */
+.modal-bg{display:none;position:fixed;inset:0;background:rgba(0,0,0,0.5);z-index:100;align-items:center;justify-content:center;padding:16px;}
+.modal-bg.open{display:flex;}
+.modal{background:#fff;border-radius:20px;padding:1.5rem;width:100%;max-width:360px;}
+.modal h3{font-size:17px;font-weight:700;color:#0a1628;margin-bottom:16px;}
+.modal-input{width:100%;padding:11px 14px;border:1px solid #d1dae6;border-radius:10px;font-size:15px;background:#f8fafc;color:#0a1628;outline:none;margin-bottom:12px;}
+.modal-row{display:flex;gap:8px;}
+.modal-close{background:#f0f4f8;color:#0a1628;border:none;border-radius:10px;padding:11px 16px;font-size:14px;font-weight:600;cursor:pointer;flex:1;}
+.modal-save{background:#0a1628;color:#fff;border:none;border-radius:10px;padding:11px 16px;font-size:14px;font-weight:600;cursor:pointer;flex:1;}
+
+/* Sound toggle */
+.sound-toggle{display:flex;align-items:center;gap:8px;font-size:13px;color:#6b7a90;margin-top:8px;}
+.toggle-switch{position:relative;width:40px;height:22px;cursor:pointer;}
+.toggle-switch input{opacity:0;width:0;height:0;}
+.toggle-slider{position:absolute;inset:0;background:#d1dae6;border-radius:22px;transition:0.2s;}
+.toggle-slider:before{content:'';position:absolute;width:18px;height:18px;left:2px;top:2px;background:#fff;border-radius:50%;transition:0.2s;}
+input:checked+.toggle-slider{background:#0a1628;}
+input:checked+.toggle-slider:before{transform:translateX(18px);}
+
+/* CSV btn */
+.btn-csv{background:#f0fdf4;color:#166534;border:1px solid #86efac;border-radius:10px;padding:10px 16px;font-size:13px;font-weight:600;cursor:pointer;display:flex;align-items:center;gap:6px;}
+
+/* Screenshot button */
+.btn-screenshot{width:100%;padding:12px;background:linear-gradient(135deg,#0a1628,#1a3a6e);color:#fff;border:none;border-radius:12px;font-size:14px;font-weight:600;cursor:pointer;margin-top:10px;display:flex;align-items:center;justify-content:center;gap:8px;box-shadow:0 4px 12px rgba(10,22,40,0.25);}
+.btn-screenshot:hover{opacity:0.9;}
+.btn-screenshot:active{transform:scale(0.98);}
+</style>
+</head>
+<body>
+
+<!-- Login Screen -->
+<div class="login-box" id="login-screen">
+  <div style="font-size:40px;margin-bottom:12px;">🔐</div>
+  <h2>ადმინ პანელი</h2>
+  <p>შეიყვანე პაროლი</p>
+  <input type="password" class="pin-input" id="pin-field" placeholder="••••••" maxlength="6"/>
+  <button class="btn-login" onclick="tryLogin()">შესვლა</button>
+  <p class="err" id="login-err">❌ არასწორი პაროლი</p>
+</div>
+
+<!-- Admin Panel -->
+<div class="admin-wrap" id="admin-panel">
+  <div class="hero" style="position:relative;">
+    <div class="badge">🛠️ ადმინ რეჟიმი</div>
+    <h1>სამრეცხაო — ოპერატორი</h1>
+    <p id="live-time"></p>
+    <button class="logout-btn" onclick="logout()">გამოსვლა</button>
+  </div>
+
+  <!-- Sound toggle -->
+  <div class="card" style="padding:12px 16px;">
+    <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:10px;">
+      <div class="sound-toggle">
+        <label class="toggle-switch"><input type="checkbox" id="sound-toggle" checked/><span class="toggle-slider"></span></label>
+        <span>🔔 ხმა + ვიბრაცია</span>
+      </div>
+      <button class="btn-csv" onclick="exportCSV()">📥 CSV ექსპორტი</button>
+    </div>
+  </div>
+
+  <div class="admin-tabs">
+    <div class="admin-tab active" onclick="showAdminTab('loyalty',this)">📱 ლოიალობა</div>
+    <div class="admin-tab" onclick="showAdminTab('clients',this)">👥 კლიენტები</div>
+    <div class="admin-tab" onclick="showAdminTab('stats',this)">📊 სტატ.</div>
+    <div class="admin-tab" onclick="showAdminTab('prices',this)">💰 ფასები</div>
+    <div class="admin-tab" onclick="showAdminTab('photos',this)">📸 ფოტო</div>
+    <div class="admin-tab" onclick="showAdminTab('howto',this)">🧼 ინსტრ.</div>
+  </div>
+
+  <!-- LOYALTY TAB -->
+  <div id="admin-loyalty" class="section active">
+    <div class="card">
+      <div class="card-title">📱 კლიენტის ნომერი</div>
+      <div class="input-row">
+        <input type="tel" id="phone-input" placeholder="ტელეფონის ნომერი (მაგ: 599123456)" maxlength="12"/>
+        <button class="btn-primary" onclick="checkCard()">🔍</button>
+      </div>
+      <div id="loyalty-result" class="result-box"></div>
+      <div id="stamp-section" style="display:none;">
+        <div class="stamps" id="stamps-display"></div>
+        <p class="progress-text" id="progress-text"></p>
+
+        <div class="stat-row" id="stat-row" style="margin-top:12px;display:none;">
+          <div class="stat-box">
+            <div class="stat-num" id="stat-total">0</div>
+            <div class="stat-lbl">სულ რეცხვა</div>
+          </div>
+          <div class="stat-box">
+            <div class="stat-num" id="stat-free">0</div>
+            <div class="stat-lbl">უფასო მიღებული</div>
+          </div>
+        </div>
+
+        <div id="history-section" style="display:none;margin:8px 0;">
+          <p style="font-size:12px;font-weight:600;color:#0a1628;margin-bottom:6px;">ბოლო ვიზიტები</p>
+          <div id="history-list"></div>
+        </div>
+
+        <button class="btn-wash" id="wash-btn" onclick="registerWash()">
+          <span id="wash-txt">✅ + რეცხვის დამატება</span>
+        </button>
+
+        <!-- Edit wash count -->
+        <div style="margin-top:8px;display:flex;gap:8px;">
+          <button class="btn-danger" style="flex:1;padding:10px;" onclick="openEditModal()">✏️ კორექტირება</button>
+          <button style="flex:1;padding:10px;background:#fef2f2;color:#dc2626;border:1px solid #fca5a5;border-radius:10px;font-size:13px;font-weight:600;cursor:pointer;" onclick="confirmDelete()">🗑️ წაშლა</button>
+        </div>
+        <!-- Screenshot button -->
+        <button class="btn-screenshot" onclick="takeAdminScreenshot()">📲 ეკრანზე გადმოტანა</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- CLIENTS TAB -->
+  <div id="admin-clients" class="section">
+    <div class="card">
+      <div class="card-title">👥 კლიენტების სია</div>
+      <input class="search-input" id="client-search" placeholder="🔍 ნომრით ძიება..." oninput="renderClientsList()"/>
+      <div class="filter-row">
+        <button class="filter-btn active" onclick="setFilter('all',this)">ყველა</button>
+        <button class="filter-btn" onclick="setFilter('free',this)">🎁 უფასო ეკუთვნის</button>
+        <button class="filter-btn" onclick="setFilter('top',this)">🏆 ტოპ 10</button>
+      </div>
+      <div id="clients-loading" style="text-align:center;padding:1rem;color:#6b7a90;">⏳ იტვირთება...</div>
+      <div id="clients-list"></div>
+      <div id="clients-empty" style="display:none;text-align:center;padding:1rem;color:#6b7a90;">კლიენტი ვერ მოიძებნა</div>
+    </div>
+  </div>
+
+  <!-- STATS TAB -->
+  <div id="admin-stats" class="section">
+    <div class="big-stat-row">
+      <div class="big-stat">
+        <div class="big-stat-num" id="gs-total">—</div>
+        <div class="big-stat-lbl">სულ კლიენტი</div>
+      </div>
+      <div class="big-stat">
+        <div class="big-stat-num" id="gs-washes">—</div>
+        <div class="big-stat-lbl">სულ რეცხვა</div>
+      </div>
+      <div class="big-stat">
+        <div class="big-stat-num" id="gs-free">—</div>
+        <div class="big-stat-lbl">უფასო გაცემული</div>
+      </div>
+      <div class="big-stat">
+        <div class="big-stat-num" id="gs-avg">—</div>
+        <div class="big-stat-lbl">საშ. კლიენტზე</div>
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-title">📅 ბოლო 7 დღე</div>
+      <div class="chart-bar-wrap" id="week-chart"></div>
+      <div class="chart-labels" id="week-labels"></div>
+    </div>
+    <div class="card">
+      <div class="card-title">🏆 ტოპ 5 კლიენტი</div>
+      <div id="top-clients"></div>
+    </div>
+  </div>
+
+  <!-- PRICES TAB -->
+  <div id="admin-prices" class="section">
+    <div class="card">
+      <div class="card-title">💰 ფასების მართვა</div>
+      <p style="font-size:13px;color:#6b7a90;margin-bottom:16px;">ცვლილებები კლიენტის გვერდზე ავტომატურად გამოჩნდება.</p>
+
+      <div style="margin-bottom:16px;">
+        <p style="font-size:13px;font-weight:700;color:#0a1628;margin-bottom:8px;">🚿 რეცხვის ფასი</p>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;">
+          <div>
+            <label style="font-size:11px;color:#6b7a90;display:block;margin-bottom:4px;">ჩვეულებრივი (₾)</label>
+            <input type="number" class="modal-input" id="p-wash-normal" min="0" step="0.5" style="margin-bottom:0;"/>
+          </div>
+          <div>
+            <label style="font-size:11px;color:#6b7a90;display:block;margin-bottom:4px;">ღამის (₾)</label>
+            <input type="number" class="modal-input" id="p-wash-night" min="0" step="0.5" style="margin-bottom:0;"/>
+          </div>
+        </div>
+      </div>
+
+      <div style="margin-bottom:16px;">
+        <p style="font-size:13px;font-weight:700;color:#0a1628;margin-bottom:8px;">🧹 აქსესუარები</p>
+        <div style="display:flex;flex-direction:column;gap:8px;">
+          <div style="display:flex;align-items:center;gap:8px;">
+            <span style="font-size:13px;color:#374151;flex:1;">🌀 მტვერსასრუტი</span>
+            <input type="number" class="modal-input" id="p-vacuum" min="0" step="0.5" style="width:90px;margin-bottom:0;text-align:center;"/>
+            <span style="font-size:13px;color:#6b7a90;">₾</span>
+          </div>
+          <div style="display:flex;align-items:center;gap:8px;">
+            <span style="font-size:13px;color:#374151;flex:1;">⚙️ ბორბლები</span>
+            <input type="number" class="modal-input" id="p-wheels" min="0" step="0.5" style="width:90px;margin-bottom:0;text-align:center;"/>
+            <span style="font-size:13px;color:#6b7a90;">₾</span>
+          </div>
+          <div style="display:flex;align-items:center;gap:8px;">
+            <span style="font-size:13px;color:#374151;flex:1;">🟫 ხალიჩა</span>
+            <input type="number" class="modal-input" id="p-carpet" min="0" step="0.5" style="width:90px;margin-bottom:0;text-align:center;"/>
+            <span style="font-size:13px;color:#6b7a90;">₾</span>
+          </div>
+        </div>
+      </div>
+
+      <div style="margin-bottom:16px;">
+        <p style="font-size:13px;font-weight:700;color:#0a1628;margin-bottom:8px;">🎯 კომბო (3 აქსესუარი)</p>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;">
+          <div>
+            <label style="font-size:11px;color:#6b7a90;display:block;margin-bottom:4px;">ძველი ფასი (₾)</label>
+            <input type="number" class="modal-input" id="p-combo-old" min="0" step="0.5" style="margin-bottom:0;"/>
+          </div>
+          <div>
+            <label style="font-size:11px;color:#6b7a90;display:block;margin-bottom:4px;">ახალი ფასი (₾)</label>
+            <input type="number" class="modal-input" id="p-combo-new" min="0" step="0.5" style="margin-bottom:0;"/>
+          </div>
+        </div>
+      </div>
+
+      <div style="margin-bottom:16px;">
+        <p style="font-size:13px;font-weight:700;color:#0a1628;margin-bottom:8px;">🌙 ღამის ფასდაკლება</p>
+        <div style="display:flex;align-items:center;gap:8px;">
+          <input type="number" class="modal-input" id="p-night-disc" min="0" max="99" style="width:90px;margin-bottom:0;text-align:center;"/>
+          <span style="font-size:16px;color:#0a1628;font-weight:700;">%</span>
+        </div>
+      </div>
+
+      <div id="prices-save-result" class="result-box" style="margin-bottom:10px;"></div>
+      <button class="btn-wash" onclick="savePrices()" id="save-prices-btn">
+        <span id="save-prices-txt">💾 შენახვა</span>
+      </button>
+    </div>
+  </div>
+
+  <!-- PHOTOS TAB -->
+  <div id="admin-photos" class="section">
+    <div class="card" style="text-align:center;padding:1rem;">
+      <div class="card-title" style="justify-content:center;">📸 კლიენტების ფოტოები</div>
+      <button onclick="loadPhotos()" style="background:#0a1628;color:#fff;border:none;border-radius:10px;padding:10px 20px;font-size:13px;font-weight:600;cursor:pointer;margin-bottom:12px;">🔄 განახლება</button>
+    </div>
+    <div id="photos-list"></div>
+  </div>
+
+  <!-- HOWTO ADMIN SECTION -->
+  <div id="admin-howto" class="section">
+    <div class="card">
+      <div class="card-title">🧼 ინსტრუქციის მართვა</div>
+      <p style="font-size:13px;color:#6b7a90;margin-bottom:14px;">ჩაწერე ნაბიჯები JSON ფორმატში. icon, title, text</p>
+      <textarea id="howto-editor" style="width:100%;min-height:300px;padding:12px;border:1px solid #d1dae6;border-radius:10px;font-size:12px;font-family:monospace;background:#f8fafc;color:#0a1628;outline:none;resize:vertical;line-height:1.5;" placeholder="იტვირთება..."></textarea>
+      <div id="howto-preview" style="margin-top:14px;"></div>
+      <div style="display:flex;gap:8px;margin-top:12px;">
+        <button onclick="previewHowTo()" style="flex:1;padding:11px;background:#f0f4f8;color:#0a1628;border:1px solid #d1dae6;border-radius:10px;font-size:13px;font-weight:600;cursor:pointer;">👁️ გადახედვა</button>
+        <button onclick="saveHowTo()" style="flex:1;padding:11px;background:#0a1628;color:#fff;border:none;border-radius:10px;font-size:14px;font-weight:700;cursor:pointer;">💾 შენახვა</button>
+      </div>
+      <div id="howto-save-result" class="result-box" style="margin-top:10px;"></div>
+    </div>
+  </div>
+</div>
+
+<!-- Edit Modal -->
+<div class="modal-bg" id="edit-modal">
+  <div class="modal">
+    <h3>✏️ რეცხვის კორექტირება</h3>
+    <p style="font-size:13px;color:#6b7a90;margin-bottom:14px;">კლიენტი: <strong id="edit-phone-display"></strong></p>
+    <label style="font-size:13px;color:#0a1628;font-weight:600;display:block;margin-bottom:6px;">სულ რეცხვების რაოდენობა:</label>
+    <input type="number" class="modal-input" id="edit-count-input" min="0" max="9999"/>
+    <p style="font-size:12px;color:#6b7a90;margin-bottom:14px;">* ეს შეცვლის სრულ ისტორიას</p>
+    <div class="modal-row">
+      <button class="modal-close" onclick="closeModal()">გაუქმება</button>
+      <button class="modal-save" onclick="saveEdit()">შენახვა</button>
+    </div>
+  </div>
+</div>
+
+<script>
+var ADMIN_PASS = '200619';
+var BIN_ID = '69ffbf37250b1311c3295b21';
+var API_KEY = '$2a$10$9DtWMw4mQ3z2.ohB/nRgLOnAB6kcyUIfgEI4AF409KEQaoBbHB0KK';
+var BASE_URL = 'https://api.jsonbin.io/v3/b/' + BIN_ID;
+var PRICES_BIN_ID = '69ffbf37250b1311c3295b21'; // same bin, prices stored as allData._prices
+
+var currentPhone = '';
+var currentCount = 0;
+var allData = {};
+var clientFilter = 'all';
+
+document.getElementById('pin-field').addEventListener('keydown', function(e){ if(e.key==='Enter') tryLogin(); });
+document.getElementById('phone-input').addEventListener('keydown', function(e){ if(e.key==='Enter') checkCard(); });
+
+/* ===== AUTH ===== */
+function tryLogin() {
+  var val = document.getElementById('pin-field').value.trim();
+  if (val === ADMIN_PASS) {
+    document.getElementById('login-screen').style.display = 'none';
+    document.body.style.background = '#f0f4f8';
+    document.body.style.alignItems = 'flex-start';
+    document.getElementById('admin-panel').style.display = 'block';
+    updateTime();
+    setInterval(updateTime, 30000);
+  } else {
+    document.getElementById('login-err').style.display = 'block';
+    document.getElementById('pin-field').value = '';
+    document.getElementById('pin-field').focus();
+  }
+}
+
+function logout() {
+  document.getElementById('admin-panel').style.display = 'none';
+  document.body.style.background = '#0a1628';
+  document.body.style.alignItems = 'center';
+  document.getElementById('login-screen').style.display = 'block';
+  document.getElementById('pin-field').value = '';
+  document.getElementById('login-err').style.display = 'none';
+}
+
+/* ===== TABS ===== */
+function showAdminTab(name, el) {
+  document.querySelectorAll('.section').forEach(function(s){ s.classList.remove('active'); });
+  document.querySelectorAll('.admin-tab').forEach(function(t){ t.classList.remove('active'); });
+  document.getElementById('admin-' + name).classList.add('active');
+  el.classList.add('active');
+  if (name === 'photos') loadPhotos();
+  if (name === 'clients') loadClientsTab();
+  if (name === 'stats') loadStatsTab();
+  if (name === 'howto') loadAdminHowTo();
+  if (name === 'prices') loadPricesTab();
+}
+
+/* ===== SOUND / VIBRATE ===== */
+function playSuccess() {
+  if (!document.getElementById('sound-toggle').checked) return;
+  try {
+    var ctx = new (window.AudioContext || window.webkitAudioContext)();
+    var osc = ctx.createOscillator();
+    var gain = ctx.createGain();
+    osc.connect(gain); gain.connect(ctx.destination);
+    osc.frequency.setValueAtTime(880, ctx.currentTime);
+    osc.frequency.setValueAtTime(1100, ctx.currentTime + 0.1);
+    gain.gain.setValueAtTime(0.3, ctx.currentTime);
+    gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.4);
+    osc.start(ctx.currentTime); osc.stop(ctx.currentTime + 0.4);
+  } catch(e){}
+  if (navigator.vibrate) navigator.vibrate([100, 50, 100]);
+}
+
+function playFree() {
+  if (!document.getElementById('sound-toggle').checked) return;
+  try {
+    var ctx = new (window.AudioContext || window.webkitAudioContext)();
+    [440,554,659,880].forEach(function(freq, i) {
+      var osc = ctx.createOscillator(), gain = ctx.createGain();
+      osc.connect(gain); gain.connect(ctx.destination);
+      osc.frequency.value = freq;
+      gain.gain.setValueAtTime(0.2, ctx.currentTime + i*0.12);
+      gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + i*0.12 + 0.3);
+      osc.start(ctx.currentTime + i*0.12); osc.stop(ctx.currentTime + i*0.12 + 0.3);
+    });
+  } catch(e){}
+  if (navigator.vibrate) navigator.vibrate([200, 100, 200, 100, 400]);
+}
+
+/* ===== UI HELPERS ===== */
+function showResult(msg, type) {
+  var el = document.getElementById('loyalty-result');
+  el.className = 'result-box ' + type;
+  el.innerHTML = msg;
+  el.style.display = 'block';
+}
+
+function setLoading(on) {
+  var btn = document.getElementById('wash-btn');
+  var txt = document.getElementById('wash-txt');
+  btn.disabled = on;
+  txt.innerHTML = on ? '<div class="spinner"></div>' : '✅ + რეცხვის დამატება';
+}
+
+function updateTime() {
+  var now = new Date(), h = now.getHours(), m = now.getMinutes();
+  var el = document.getElementById('live-time');
+  if (el) el.textContent = 'ახლა: ' + (h<10?'0'+h:h) + ':' + (m<10?'0'+m:m);
+}
+
+/* ===== STAMPS ===== */
+function renderStamps(count) {
+  var html = '', pos = count % 10;
+  for (var i = 1; i <= 10; i++) {
+    if (i === 10) {
+      html += (count > 0 && count % 10 === 0)
+        ? '<div class="stamp free-done">🎁</div>'
+        : '<div class="stamp free-slot" style="font-size:13px;font-weight:700;">10</div>';
+    } else if (i <= pos) {
+      html += '<div class="stamp filled" style="font-size:13px;font-weight:700;">' + i + '</div>';
+    } else {
+      html += '<div class="stamp" style="font-size:13px;color:#c8d3e0;">' + i + '</div>';
+    }
+  }
+  document.getElementById('stamps-display').innerHTML = html;
+  var rem = pos === 0 ? (count > 0 ? 0 : 10) : 10 - pos;
+  document.getElementById('progress-text').textContent = (count > 0 && count % 10 === 0)
+    ? '🎉 უფასო რეცხვა გაქვს! · სულ: ' + count
+    : 'კიდევ ' + rem + ' რეცხვა უფასომდე · სულ: ' + count;
+}
+
+function renderStats(data) {
+  var count = data.count || 0;
+  document.getElementById('stat-total').textContent = count;
+  document.getElementById('stat-free').textContent = Math.floor(count / 10);
+  document.getElementById('stat-row').style.display = 'flex';
+  var history = data.history || [];
+  if (history.length > 0) {
+    var last5 = history.slice(-5).reverse();
+    var html = last5.map(function(d){ return '<div class="history-item"><span>🚗 რეცხვა</span><span>' + d + '</span></div>'; }).join('');
+    document.getElementById('history-list').innerHTML = html;
+    document.getElementById('history-section').style.display = 'block';
+  }
+}
+
+/* ===== DATA ===== */
+function loadData(callback) {
+  fetch(BASE_URL + '/latest', { headers: { 'X-Master-Key': API_KEY } })
+    .then(function(r){ return r.json(); })
+    .then(function(r){ allData = r.record || {}; callback(null); })
+    .catch(function(e){ callback(e); });
+}
+
+function saveData(callback) {
+  fetch(BASE_URL, {
+    method: 'PUT',
+    headers: { 'Content-Type': 'application/json', 'X-Master-Key': API_KEY },
+    body: JSON.stringify(allData)
+  })
+  .then(function(r){ return r.json(); })
+  .then(function(){ callback(null); })
+  .catch(function(e){ callback(e); });
+}
+
+/* ===== CHECK CARD ===== */
+function checkCard() {
+  var phone = document.getElementById('phone-input').value.trim();
+  if (!phone || phone.length < 9) { showResult('შეიყვანე სწორი ნომერი', 'error'); return; }
+  currentPhone = phone;
+  showResult('⏳ ვამოწმებ...', 'info');
+  document.getElementById('stamp-section').style.display = 'none';
+  document.getElementById('stat-row').style.display = 'none';
+  document.getElementById('history-section').style.display = 'none';
+
+  loadData(function(err) {
+    if (err) { showResult('კავშირის შეცდომა.', 'error'); return; }
+    var entry = allData[phone] || { count: 0, history: [] };
+    currentCount = entry.count;
+    document.getElementById('loyalty-result').style.display = 'none';
+    document.getElementById('stamp-section').style.display = 'block';
+    renderStamps(currentCount);
+    renderStats(entry);
+    if (currentCount > 0 && currentCount % 10 === 0) {
+      showResult('🎁 კლიენტს უფასო რეცხვა აქვს!', 'free');
+    }
+  });
+}
+
+/* ===== REGISTER WASH ===== */
+function registerWash() {
+  if (!currentPhone) return;
+  setLoading(true);
+  loadData(function(err) {
+    if (err) { setLoading(false); showResult('კავშირის შეცდომა.', 'error'); return; }
+    var now = new Date();
+    var dateStr = now.getFullYear() + '-' + String(now.getMonth()+1).padStart(2,'0') + '-' + String(now.getDate()).padStart(2,'0') + ' ' + String(now.getHours()).padStart(2,'0') + ':' + String(now.getMinutes()).padStart(2,'0');
+    if (!allData[currentPhone]) allData[currentPhone] = { count: 0, history: [] };
+    allData[currentPhone].count += 1;
+    allData[currentPhone].history.push(dateStr);
+    currentCount = allData[currentPhone].count;
+    saveData(function(err2) {
+      setLoading(false);
+      if (err2) { showResult('შენახვის შეცდომა.', 'error'); return; }
+      renderStamps(currentCount);
+      renderStats(allData[currentPhone]);
+      if (currentCount > 0 && currentCount % 10 === 0) {
+        showResult('🎁 მე-' + currentCount + '-ე რეცხვა — შემდეგი <strong>უფასოა!</strong>', 'free');
+        playFree();
+      } else {
+        showResult('✅ რეცხვა ჩაინიშნა! სულ: ' + currentCount, 'success');
+        playSuccess();
+      }
+    });
+  });
+}
+
+/* ===== EDIT MODAL ===== */
+function openEditModal() {
+  if (!currentPhone) return;
+  document.getElementById('edit-phone-display').textContent = currentPhone;
+  document.getElementById('edit-count-input').value = currentCount;
+  document.getElementById('edit-modal').classList.add('open');
+}
+
+function closeModal() {
+  document.getElementById('edit-modal').classList.remove('open');
+}
+
+function saveEdit() {
+  var newCount = parseInt(document.getElementById('edit-count-input').value);
+  if (isNaN(newCount) || newCount < 0) { alert('შეიყვანე სწორი რიცხვი'); return; }
+  loadData(function(err) {
+    if (err) { alert('კავშირის შეცდომა'); return; }
+    if (!allData[currentPhone]) allData[currentPhone] = { count: 0, history: [] };
+    allData[currentPhone].count = newCount;
+    currentCount = newCount;
+    saveData(function(err2) {
+      if (err2) { alert('შენახვის შეცდომა'); return; }
+      closeModal();
+      renderStamps(currentCount);
+      renderStats(allData[currentPhone]);
+      showResult('✅ კორექტირება შესრულდა! ახალი: ' + newCount, 'success');
+    });
+  });
+}
+
+/* ===== DELETE CLIENT ===== */
+function confirmDelete() {
+  if (!currentPhone) return;
+  if (!confirm('წაიშალოს კლიენტი ' + currentPhone + '?')) return;
+  loadData(function(err) {
+    if (err) { alert('კავშირის შეცდომა'); return; }
+    delete allData[currentPhone];
+    saveData(function(err2) {
+      if (err2) { alert('შენახვის შეცდომა'); return; }
+      currentPhone = '';
+      currentCount = 0;
+      document.getElementById('phone-input').value = '';
+      document.getElementById('stamp-section').style.display = 'none';
+      document.getElementById('loyalty-result').style.display = 'none';
+      showResult('🗑️ კლიენტი წაიშალა', 'info');
+      document.getElementById('loyalty-result').style.display = 'block';
+    });
+  });
+}
+
+/* ===== CLIENTS LIST TAB ===== */
+function setFilter(f, el) {
+  clientFilter = f;
+  document.querySelectorAll('.filter-btn').forEach(function(b){ b.classList.remove('active'); });
+  el.classList.add('active');
+  renderClientsList();
+}
+
+function loadClientsTab() {
+  document.getElementById('clients-loading').style.display = 'block';
+  document.getElementById('clients-list').innerHTML = '';
+  loadData(function(err) {
+    document.getElementById('clients-loading').style.display = 'none';
+    if (err) { document.getElementById('clients-list').innerHTML = '<p style="color:#dc2626;text-align:center;">კავშირის შეცდომა</p>'; return; }
+    renderClientsList();
+  });
+}
+
+function renderClientsList() {
+  var search = (document.getElementById('client-search').value || '').toLowerCase();
+  var list = document.getElementById('clients-list');
+  var empty = document.getElementById('clients-empty');
+
+  var entries = Object.keys(allData).map(function(ph) {
+    return { phone: ph, count: allData[ph].count || 0, history: allData[ph].history || [] };
+  });
+
+  if (clientFilter === 'free') entries = entries.filter(function(e){ return e.count > 0 && e.count % 10 === 0; });
+  if (clientFilter === 'top') entries.sort(function(a,b){ return b.count - a.count; }).splice(10);
+  else entries.sort(function(a,b){ return b.count - a.count; });
+
+  if (search) entries = entries.filter(function(e){ return e.phone.toLowerCase().includes(search); });
+
+  if (entries.length === 0) { list.innerHTML = ''; empty.style.display = 'block'; return; }
+  empty.style.display = 'none';
+
+  list.innerHTML = entries.map(function(e) {
+    var isFree = e.count > 0 && e.count % 10 === 0;
+    var last = e.history.length > 0 ? e.history[e.history.length - 1] : '—';
+    return '<div class="client-item' + (isFree ? ' free-due' : '') + '" onclick="selectClientFromList(\'' + e.phone + '\')">' +
+      '<div><div class="client-phone">' + e.phone + '</div><div class="client-meta">ბოლო: ' + last + '</div></div>' +
+      '<div class="client-badge' + (isFree ? ' free' : '') + '">' + (isFree ? '🎁 უფასო!' : '🚗 ' + e.count) + '</div>' +
+    '</div>';
+  }).join('');
+}
+
+function selectClientFromList(phone) {
+  document.getElementById('phone-input').value = phone;
+  showAdminTab('loyalty', document.querySelector('.admin-tab'));
+  document.querySelectorAll('.admin-tab').forEach(function(t){ t.classList.remove('active'); });
+  document.querySelector('.admin-tab').classList.add('active');
+  checkCard();
+}
+
+/* ===== STATS TAB ===== */
+function loadStatsTab() {
+  loadData(function(err) {
+    if (err) return;
+    var phones = Object.keys(allData);
+    var totalWashes = 0, totalFree = 0;
+    phones.forEach(function(p) {
+      var c = allData[p].count || 0;
+      totalWashes += c;
+      totalFree += Math.floor(c / 10);
+    });
+    document.getElementById('gs-total').textContent = phones.length;
+    document.getElementById('gs-washes').textContent = totalWashes;
+    document.getElementById('gs-free').textContent = totalFree;
+    document.getElementById('gs-avg').textContent = phones.length > 0 ? (totalWashes / phones.length).toFixed(1) : '0';
+
+    // Week chart
+    var dayCounts = {};
+    var now = new Date();
+    for (var d = 6; d >= 0; d--) {
+      var day = new Date(now); day.setDate(now.getDate() - d);
+      var key = day.getFullYear() + '-' + String(day.getMonth()+1).padStart(2,'0') + '-' + String(day.getDate()).padStart(2,'0');
+      dayCounts[key] = 0;
+    }
+    phones.forEach(function(p) {
+      (allData[p].history || []).forEach(function(h) {
+        var dk = h.split(' ')[0];
+        if (dayCounts[dk] !== undefined) dayCounts[dk]++;
+      });
+    });
+    var keys = Object.keys(dayCounts);
+    var vals = keys.map(function(k){ return dayCounts[k]; });
+    var maxV = Math.max.apply(null, vals) || 1;
+    var dayNames = ['კვი','ორშ','სამ','ოთხ','ხუთ','პარ','შაბ'];
+    document.getElementById('week-chart').innerHTML = vals.map(function(v) {
+      return '<div class="chart-bar" style="height:' + Math.round((v/maxV)*76) + 'px;" title="' + v + '"></div>';
+    }).join('');
+    document.getElementById('week-labels').innerHTML = keys.map(function(k) {
+      var d = new Date(k + 'T00:00:00'); return '<div class="chart-label">' + dayNames[d.getDay()] + '</div>';
+    }).join('');
+
+    // Top 5
+    var sorted = phones.map(function(p){ return {phone:p, count: allData[p].count||0}; })
+      .sort(function(a,b){ return b.count-a.count; }).slice(0,5);
+    document.getElementById('top-clients').innerHTML = sorted.length === 0
+      ? '<p style="color:#6b7a90;text-align:center;">კლიენტი არ არის</p>'
+      : sorted.map(function(e,i) {
+          return '<div class="history-item"><span>' + ['🥇','🥈','🥉','4️⃣','5️⃣'][i] + ' ' + e.phone + '</span><span>🚗 ' + e.count + '</span></div>';
+        }).join('');
+  });
+}
+
+/* ===== CSV EXPORT ===== */
+function exportCSV() {
+  loadData(function(err) {
+    if (err) { alert('კავშირის შეცდომა'); return; }
+    var rows = ['ნომერი,სულ რეცხვა,უფასო მიღებული,ბოლო ვიზიტი'];
+    Object.keys(allData).forEach(function(ph) {
+      var d = allData[ph];
+      var count = d.count || 0;
+      var free = Math.floor(count / 10);
+      var hist = d.history || [];
+      var last = hist.length > 0 ? hist[hist.length-1] : '';
+      rows.push([ph, count, free, last].join(','));
+    });
+    var blob = new Blob(['\uFEFF' + rows.join('\n')], {type:'text/csv;charset=utf-8;'});
+    var url = URL.createObjectURL(blob);
+    var a = document.createElement('a');
+    a.href = url; a.download = 'samrecxao_' + new Date().toISOString().slice(0,10) + '.csv';
+    a.click(); URL.revokeObjectURL(url);
+  });
+}
+
+/* ===== PHOTOS ===== */
+var PHOTOS_BIN_ID = '6a004143250b1311c32bd4b1';
+var photosData = [];
+
+function loadPhotos() {
+  var list = document.getElementById('photos-list');
+  list.innerHTML = '<p style="text-align:center;color:#6b7a90;padding:1rem;">⏳ იტვირთება...</p>';
+  fetch('https://api.jsonbin.io/v3/b/' + PHOTOS_BIN_ID + '/latest', { headers: { 'X-Master-Key': API_KEY } })
+    .then(function(r){ return r.json(); })
+    .then(function(r) { photosData = (r.record && r.record.photos) ? r.record.photos : []; renderPhotos(); })
+    .catch(function(){ list.innerHTML = '<p style="text-align:center;color:#dc2626;padding:1rem;">კავშირის შეცდომა</p>'; });
+}
+
+function renderPhotos() {
+  var list = document.getElementById('photos-list');
+  if (photosData.length === 0) { list.innerHTML = '<p style="text-align:center;color:#6b7a90;padding:2rem;">ჯერ ფოტო არ არის</p>'; return; }
+  list.innerHTML = photosData.map(function(p, i) {
+    var actions = p.approved
+      ? '<span class="approved-badge">✅ დამტკიცებული</span>'
+      : '<button class="btn-approve" onclick="approvePhoto(' + i + ')">✅ დამტკიცება</button>';
+    return '<div class="photo-card"><img src="' + p.url + '" alt="car"/><div class="photo-meta"><div><div class="photo-phone">📱 ' + p.phone + '</div>' + (p.name ? '<div style="font-size:13px;color:#374151;font-weight:600;">👤 ' + p.name + '</div>' : '') + '<div class="photo-time">🕐 ' + p.time + '</div></div><div style="display:flex;gap:6px;">' + actions + '<button class="btn-delete" onclick="deletePhoto(' + i + ')">🗑️</button></div></div></div>';
+  }).join('');
+}
+
+function savePhotos(cb) {
+  fetch('https://api.jsonbin.io/v3/b/' + PHOTOS_BIN_ID, {
+    method: 'PUT', headers: { 'Content-Type': 'application/json', 'X-Master-Key': API_KEY },
+    body: JSON.stringify({ photos: photosData })
+  }).then(function(){ cb && cb(); }).catch(function(){ alert('შენახვის შეცდომა'); });
+}
+
+function approvePhoto(i) { photosData[i].approved = true; savePhotos(function(){ renderPhotos(); }); }
+function deletePhoto(i) { if (!confirm('წაიშალოს ფოტო?')) return; photosData.splice(i,1); savePhotos(function(){ renderPhotos(); }); }
+
+/* ===== PRICES ===== */
+var DEFAULT_PRICES = { washNormal: 3, washNight: 2.4, vacuum: 4, wheels: 5, carpet: 5, comboOld: 14, comboNew: 11, nightDisc: 20 };
+
+function loadPricesTab() {
+  loadData(function(err) {
+    if (err) return;
+    var p = allData['_prices'] || DEFAULT_PRICES;
+    document.getElementById('p-wash-normal').value = p.washNormal || DEFAULT_PRICES.washNormal;
+    document.getElementById('p-wash-night').value = p.washNight || DEFAULT_PRICES.washNight;
+    document.getElementById('p-vacuum').value = p.vacuum || DEFAULT_PRICES.vacuum;
+    document.getElementById('p-wheels').value = p.wheels || DEFAULT_PRICES.wheels;
+    document.getElementById('p-carpet').value = p.carpet || DEFAULT_PRICES.carpet;
+    document.getElementById('p-combo-old').value = p.comboOld || DEFAULT_PRICES.comboOld;
+    document.getElementById('p-combo-new').value = p.comboNew || DEFAULT_PRICES.comboNew;
+    document.getElementById('p-night-disc').value = p.nightDisc || DEFAULT_PRICES.nightDisc;
+  });
+}
+
+function savePrices() {
+  var btn = document.getElementById('save-prices-btn');
+  var txt = document.getElementById('save-prices-txt');
+  btn.disabled = true; txt.innerHTML = '<div class="spinner"></div>';
+
+  var p = {
+    washNormal: parseFloat(document.getElementById('p-wash-normal').value) || 0,
+    washNight: parseFloat(document.getElementById('p-wash-night').value) || 0,
+    vacuum: parseFloat(document.getElementById('p-vacuum').value) || 0,
+    wheels: parseFloat(document.getElementById('p-wheels').value) || 0,
+    carpet: parseFloat(document.getElementById('p-carpet').value) || 0,
+    comboOld: parseFloat(document.getElementById('p-combo-old').value) || 0,
+    comboNew: parseFloat(document.getElementById('p-combo-new').value) || 0,
+    nightDisc: parseFloat(document.getElementById('p-night-disc').value) || 0
+  };
+
+  loadData(function(err) {
+    if (err) { btn.disabled=false; txt.textContent='💾 შენახვა'; return; }
+    allData['_prices'] = p;
+    saveData(function(err2) {
+      btn.disabled = false; txt.textContent = '💾 შენახვა';
+      var res = document.getElementById('prices-save-result');
+      if (err2) { res.className='result-box error'; res.textContent='შენახვის შეცდომა'; }
+      else { res.className='result-box success'; res.textContent='✅ ფასები შეინახა! კლიენტის გვერდი განახლდა.'; }
+      res.style.display = 'block';
+      playSuccess();
+    });
+  });
+}
+
+/* ===== SCREENSHOT / CARD GENERATOR ===== */
+function takeAdminScreenshot() {
+  var phone = currentPhone;
+  if (!phone) { alert('ჯერ კლიენტი ამოიღე'); return; }
+  var count = currentCount || 0;
+  var pos = count % 10;
+
+  var W = 800, H = 520;
+  var canvas = document.createElement('canvas');
+  canvas.width = W; canvas.height = H;
+  var ctx = canvas.getContext('2d');
+
+  var bg = ctx.createLinearGradient(0, 0, W, H);
+  bg.addColorStop(0, '#0a1628');
+  bg.addColorStop(1, '#1a3a6e');
+  ctx.fillStyle = bg;
+  adminRoundRect(ctx, 0, 0, W, H, 32);
+  ctx.fill();
+
+  ctx.beginPath(); ctx.arc(W-60,-30,130,0,Math.PI*2);
+  ctx.fillStyle='rgba(255,255,255,0.04)'; ctx.fill();
+  ctx.beginPath(); ctx.arc(60,H+30,120,0,Math.PI*2);
+  ctx.fillStyle='rgba(255,255,255,0.04)'; ctx.fill();
+
+  ctx.fillStyle='rgba(255,255,255,0.5)';
+  ctx.font='600 22px Segoe UI,sans-serif';
+  ctx.fillText('თვითმომსახურების სამრეცხაო',48,62);
+
+  ctx.fillStyle='#fff';
+  ctx.font='700 38px Segoe UI,sans-serif';
+  ctx.fillText('📱 ლოიალობის ბარათი',48,120);
+
+  ctx.fillStyle='#7dd3fc';
+  ctx.font='600 28px Segoe UI,sans-serif';
+  ctx.fillText(phone,48,168);
+
+  ctx.strokeStyle='rgba(255,255,255,0.12)'; ctx.lineWidth=1;
+  ctx.beginPath(); ctx.moveTo(48,192); ctx.lineTo(W-48,192); ctx.stroke();
+
+  ctx.fillStyle='rgba(255,255,255,0.55)';
+  ctx.font='500 18px Segoe UI,sans-serif';
+  ctx.fillText('ყოველი მე-10 რეცხვა — უფასოა! 🎁',48,228);
+
+  var stampX=48,stampY=260,stampR=26,stampGap=64;
+  for(var i=1;i<=10;i++){
+    var cx=stampX+(i-1)*stampGap+stampR, cy=stampY+stampR;
+    ctx.beginPath(); ctx.arc(cx,cy,stampR,0,Math.PI*2);
+    if(i===10){
+      if(count>0&&count%10===0){
+        ctx.fillStyle='#16a34a'; ctx.fill();
+        ctx.fillStyle='#fff'; ctx.font='700 22px Segoe UI,sans-serif';
+        ctx.textAlign='center'; ctx.fillText('🎁',cx,cy+8); ctx.textAlign='left';
+      } else {
+        ctx.strokeStyle='#4ade80'; ctx.lineWidth=2; ctx.setLineDash([4,4]); ctx.stroke(); ctx.setLineDash([]);
+        ctx.fillStyle='#4ade8066'; ctx.fill();
+        ctx.fillStyle='#4ade80'; ctx.font='700 16px Segoe UI,sans-serif';
+        ctx.textAlign='center'; ctx.fillText('10',cx,cy+6); ctx.textAlign='left';
+      }
+    } else if(i<=pos){
+      ctx.fillStyle='#0a1628'; ctx.fill();
+      ctx.strokeStyle='#7dd3fc'; ctx.lineWidth=2.5; ctx.stroke();
+      ctx.fillStyle='#7dd3fc'; ctx.font='700 18px Segoe UI,sans-serif';
+      ctx.textAlign='center'; ctx.fillText(i,cx,cy+7); ctx.textAlign='left';
+    } else {
+      ctx.strokeStyle='rgba(255,255,255,0.2)'; ctx.lineWidth=1.5; ctx.setLineDash([4,4]); ctx.stroke(); ctx.setLineDash([]);
+      ctx.fillStyle='rgba(255,255,255,0.05)'; ctx.fill();
+      ctx.fillStyle='rgba(255,255,255,0.25)'; ctx.font='600 16px Segoe UI,sans-serif';
+      ctx.textAlign='center'; ctx.fillText(i,cx,cy+7); ctx.textAlign='left';
+    }
+  }
+
+  var rem=pos===0?(count>0?0:10):10-pos;
+  var progTxt=(count>0&&count%10===0)?'🎉 უფასო რეცხვა გაქვს! სულ: '+count:'კიდევ '+rem+' რეცხვა უფასო რეცხვამდე · სულ: '+count;
+  ctx.fillStyle='rgba(255,255,255,0.6)'; ctx.font='500 17px Segoe UI,sans-serif';
+  ctx.fillText(progTxt,48,370);
+
+  ctx.fillStyle='rgba(0,0,0,0.25)';
+  adminRoundRectBottom(ctx,0,H-72,W,72,32); ctx.fill();
+  ctx.fillStyle='rgba(255,255,255,0.35)'; ctx.font='500 16px Segoe UI,sans-serif';
+  ctx.fillText('24/7 · თვითმომსახურება · ხარისხი',48,H-38);
+
+  var link=document.createElement('a');
+  link.download='barathi-'+phone+'.png';
+  link.href=canvas.toDataURL('image/png');
+  link.click();
+}
+
+function adminRoundRect(ctx,x,y,w,h,r){
+  ctx.beginPath(); ctx.moveTo(x+r,y); ctx.lineTo(x+w-r,y);
+  ctx.quadraticCurveTo(x+w,y,x+w,y+r); ctx.lineTo(x+w,y+h-r);
+  ctx.quadraticCurveTo(x+w,y+h,x+w-r,y+h); ctx.lineTo(x+r,y+h);
+  ctx.quadraticCurveTo(x,y+h,x,y+h-r); ctx.lineTo(x,y+r);
+  ctx.quadraticCurveTo(x,y,x+r,y); ctx.closePath();
+}
+function adminRoundRectBottom(ctx,x,y,w,h,r){
+  ctx.beginPath(); ctx.moveTo(x,y); ctx.lineTo(x+w,y); ctx.lineTo(x+w,y+h-r);
+  ctx.quadraticCurveTo(x+w,y+h,x+w-r,y+h); ctx.lineTo(x+r,y+h);
+  ctx.quadraticCurveTo(x,y+h,x,y+h-r); ctx.lineTo(x,y); ctx.closePath();
+}
+
+// Close modal on bg click
+document.getElementById('edit-modal').addEventListener('click', function(e){ if(e.target===this) closeModal(); });
+
+/* ===== HOW-TO ADMIN ===== */
+var DEFAULT_HOWTO_ADMIN = [
+  { "icon": "🧼", "title": "ქაფი", "text": "მიასხურეთ აქტიური ქაფი მშრალ მანქანას ქვემოდან ზემოთ. დაელოდეთ 2 წუთი, რომ ჭუჭყი დარბილდეს." },
+  { "icon": "🚿", "title": "გარეცხვა", "text": "ჩამორეცხეთ ქაფი წყლის ძლიერი ჭავლით. დაიწყეთ სახურავიდან და ჩამოდით ქვემოთ." },
+  { "icon": "✨", "title": "ცვილი", "text": "(რეკომენდირებული): გადაატარეთ დამცავი ცვილი ბზინვარებისა და წყალგამძლეობისთვის." },
+  { "icon": "💧", "title": "ოსმოსი", "text": "გადაავლეთ ოსმოსური (გაფილტრული) წყალი. ის არ ტოვებს ლაქებს, ამიტომ მანქანის გამშრალება საჭირო აღარ არის." }
+];
+
+function loadAdminHowTo() {
+  var ed = document.getElementById('howto-editor');
+  ed.value = 'იტვირთება...';
+  fetch(BASE_URL + '/latest', { headers: { 'X-Master-Key': API_KEY } })
+    .then(function(r){ return r.json(); })
+    .then(function(r) {
+      var data = r.record || {};
+      var steps = data['_howto'] || DEFAULT_HOWTO_ADMIN;
+      ed.value = JSON.stringify(steps, null, 2);
+    })
+    .catch(function() {
+      ed.value = JSON.stringify(DEFAULT_HOWTO_ADMIN, null, 2);
+    });
+}
+
+function previewHowTo() {
+  var ed = document.getElementById('howto-editor');
+  try {
+    var steps = JSON.parse(ed.value);
+    var html = '<div style="background:#f8fafc;border:1px solid #e2e8f0;border-radius:12px;padding:12px;">';
+    html += '<p style="font-size:12px;font-weight:700;color:#6b7a90;margin-bottom:10px;">გადახედვა:</p>';
+    steps.forEach(function(step, idx) {
+      html += '<div style="display:flex;gap:12px;align-items:flex-start;padding:10px 0;' +
+        (idx < steps.length - 1 ? 'border-bottom:1px solid #e2e8f0;' : '') + '">' +
+        '<div style="width:36px;height:36px;background:#0a1628;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0;">' +
+        step.icon + '</div>' +
+        '<div><p style="font-size:13px;font-weight:700;color:#0a1628;margin:0 0 3px;">' + step.title + '</p>' +
+        '<p style="font-size:12px;color:#374151;margin:0;line-height:1.5;">' + step.text + '</p></div></div>';
+    });
+    html += '</div>';
+    document.getElementById('howto-preview').innerHTML = html;
+  } catch(e) {
+    document.getElementById('howto-preview').innerHTML = '<div style="color:#dc2626;font-size:13px;padding:8px;">❌ JSON შეცდომა: ' + e.message + '</div>';
+  }
+}
+
+function saveHowTo() {
+  var ed = document.getElementById('howto-editor');
+  var res = document.getElementById('howto-save-result');
+  var steps;
+  try { steps = JSON.parse(ed.value); } catch(e) {
+    res.className = 'result-box error'; res.style.display = 'block';
+    res.textContent = '❌ JSON შეცდომა: ' + e.message; return;
+  }
+  res.className = 'result-box info'; res.style.display = 'block';
+  res.textContent = '⏳ ინახება...';
+  // Load current data, update _howto, save back
+  fetch(BASE_URL + '/latest', { headers: { 'X-Master-Key': API_KEY } })
+    .then(function(r){ return r.json(); })
+    .then(function(r) {
+      var data = r.record || {};
+      data['_howto'] = steps;
+      return fetch(BASE_URL, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json', 'X-Master-Key': API_KEY },
+        body: JSON.stringify(data)
+      });
+    })
+    .then(function() {
+      res.className = 'result-box success'; res.textContent = '✅ შენახულია! კლიენტის გვერდზე განახლდება.';
+    })
+    .catch(function() {
+      res.className = 'result-box error'; res.textContent = '❌ შენახვის შეცდომა. სცადე ხელახლა.';
+    });
+}
+</script>
+</body>
+</html>
